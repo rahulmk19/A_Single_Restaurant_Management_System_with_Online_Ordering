@@ -1,0 +1,5 @@
+package com.foodtaste.serviceImpl;
+
+public class UserDetailsServiceImpl {
+
+}

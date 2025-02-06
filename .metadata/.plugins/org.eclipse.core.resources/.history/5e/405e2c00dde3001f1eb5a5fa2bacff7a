@@ -1,0 +1,5 @@
+package com.foodtaste.controller;
+
+public class PublicController {
+
+}

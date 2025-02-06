@@ -1,0 +1,5 @@
+package com.foodtaste.utils;
+
+public class JWTUtil {
+
+}

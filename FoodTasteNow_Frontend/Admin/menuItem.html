@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Menu Items</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://wallpapercave.com/wp/wp9277538.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 90vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .navbar .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+
+        .navbar .search-bar {
+            display: flex;
+            align-items: center;
+            max-width: 60%;
+            width: 100%;
+            position: relative;
+        }
+
+        .navbar .search-bar input[type="text"] {
+            padding: 10px;
+            width: 500%;
+            border: 2px solid #ccc;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .navbar .search-bar input[type="text"]:focus {
+            border-color: #4CAF50;
+        }
+
+        .navbar .search-bar button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .navbar .search-bar button:hover {
+            background-color: #d09143;
+        }
+
+        .navbar .auth {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .auth a {
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .navbar .auth a:hover {
+            background-color: #4CAF50;
+        }
+  </style>
+</head>
+
+
+<div class="navbar">
+    <div class="logo">
+        <a href="#" style="color: white; font-size: 20px; text-decoration: none;">MyWebsite</a>
+    </div>
+    <div class="nav-links">
+        <a href="home.html">Home</a>
+        <a href="products.html">Products</a>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Search products...">
+        <button>Search</button>
+    </div>
+    <div class="auth">
+        <a href="login.html">Sign In</a>
+    </div>
+</div>
+
+<body class="bg-gray-100">
+  <div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-center mb-6">Add Menu Item</h1>
+    <form id="menuForm" class="space-y-4">
+      <div>
+        <label for="name" class="block font-medium">Food Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter food name" class="w-full p-2 border rounded" required />
+      </div>
+      <div>
+        <label for="price" class="block font-medium">Price</label>
+        <input type="number" id="price" name="price" step="0.01" placeholder="Enter price" class="w-full p-2 border rounded" required />
+      </div>
+      <div>
+        <label for="quantity" class="block font-medium">Quantity</label>
+        <input type="number" id="quantity" name="quantity" min="0" placeholder="Enter quantity" class="w-full p-2 border rounded" required />
+      </div>
+      <div>
+        <label for="category" class="block font-medium">Category</label>
+        <select id="category" name="category" class="w-full p-2 border rounded" required>
+          <option value="" disabled selected>Select category</option>
+          <option value="APPETIZER">Appetizer</option>
+          <option value="MAIN_COURSE">Main Course</option>
+          <option value="DESSERT">Dessert</option>
+        </select>
+      </div>
+      <div>
+        <label for="imageUrl" class="block font-medium">Image URL</label>
+        <input type="url" id="imageUrl" name="imageUrl" placeholder="Enter image URL" class="w-full p-2 border rounded" required />
+      </div>
+      <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 w-full">
+        Add Item
+      </button>
+    </form>
+    <p id="successMessage" class="text-green-600 font-bold text-center mt-4 hidden">Item added successfully!</p>
+  </div>
+
+  <script>
+    const form = document.getElementById('menuForm');
+    const successMessage = document.getElementById('successMessage');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Get form data
+      const menuItem = {
+        name: form.name.value,
+        price: parseFloat(form.price.value),
+        quantity: parseInt(form.quantity.value),
+        category: form.category.value,
+        imageUrl: form.imageUrl.value
+      };
+
+      try {
+        // Send POST request to backend API
+        const response = await fetch('http://localhost:8081/items', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(menuItem),
+        });
+
+        if (response.ok) {
+          successMessage.classList.remove('hidden');
+          successMessage.textContent = 'Item added successfully!';
+          form.reset();
+        } else {
+          const errorData = await response.json();
+          alert('Failed to add item: ' + errorData.message);
+        }
+      } catch (error) {
+        console.error('Error adding menu item:', error);
+        alert('An error occurred while adding the menu item. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>

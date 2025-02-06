@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://wallpapercave.com/wp/wp9277538.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 90vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .navbar .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+
+        .navbar .search-bar {
+            display: flex;
+            align-items: center;
+            max-width: 60%;
+            width: 100%;
+            position: relative;
+        }
+
+        .navbar .search-bar input[type="text"] {
+            padding: 10px;
+            width: 500%;
+            border: 2px solid #ccc;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .navbar .search-bar input[type="text"]:focus {
+            border-color: #4CAF50;
+        }
+
+        .navbar .search-bar button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .navbar .search-bar button:hover {
+            background-color: #d09143;
+        }
+
+        .navbar .auth {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .auth a {
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .navbar .auth a:hover {
+            background-color: #4CAF50;
+        }
+
+
+        .form-container {
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(51, 51, 51) 0px 0px 0px 3px;
+            max-width: 600px;
+            margin: 1% auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        input,
+        button {
+            width: calc(100% - 20px);
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #d09143;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        #error-message {
+            color: red;
+            display: none;
+        }
+
+        #success-message {
+            color: green;
+            display: none;
+        }
+
+        .link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            margin: 20px auto;
+            padding: 10px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+                rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+                rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .link a {
+            color: blue;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .link a:hover {
+            color: #82d043;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="logo">
+            <a href="#" style="color: white; font-size: 20px; text-decoration: none;">MyWebsite</a>
+        </div>
+        <div class="nav-links">
+            <a href="/index.html">Home</a>
+            <a href="products.html">Products</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+            <button>Search</button>
+        </div>
+        <div class="auth">
+            <a href="signup.html">Sign Up</a>
+        </div>
+    </div>
+
+
+    <div class="form-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+
+            <button type="submit">Login</button>
+
+            <div id="error-message" aria-live="assertive"></div>
+        </form>
+
+        <div class="link">
+            <a href="signup.html">Don't have an account? Sign Up</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+
+            try {
+                let response = await fetch("http://localhost:8081/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (response.ok) {
+                    alert("Login successful!");
+                    window.location.href = "index.html";
+                } else {
+                    let errorData = await response.json();
+                    document.getElementById("error-message").innerText = errorData.message || "Invalid credentials.";
+                    document.getElementById("error-message").style.display = "block";
+                }
+            } catch (error) {
+                alert("Network error: Please try again later.");
+            }
+        });
+    </script>
+</body>
+
+</html>
