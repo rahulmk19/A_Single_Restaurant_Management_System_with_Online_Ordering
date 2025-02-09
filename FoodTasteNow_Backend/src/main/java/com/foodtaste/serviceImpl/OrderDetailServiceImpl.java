@@ -46,7 +46,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	private UserRepository userRepository;
 
 	@Override
-	public OrderResponse createOrder(Integer userId, OrderRequest orderRequest) {
+	public OrderResponse createOrder(String userId, OrderRequest orderRequest) {
 
 		List<OrderItem> orderItems = new ArrayList<>();
 		BigDecimal totalAmount = BigDecimal.ZERO;
@@ -102,10 +102,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	}
 
 	@Override
-	public OrderDetail getOrderById(Integer id) {
+	public OrderDetail getOrderById(Integer orderId) {
 
-		OrderDetail orderDetail = orderDetailRepository.findById(id)
-				.orElseThrow(() -> new OrderException("Order not found with id:" + id));
+		OrderDetail orderDetail = orderDetailRepository.findById(orderId)
+				.orElseThrow(() -> new OrderException("Order not found with id:" + orderId));
 		return orderDetail;
 	}
 
@@ -130,8 +130,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 	@Override
 	@Transactional
-	public OrderDetail cancelOrderById(Integer id) {
-		OrderDetail orderDetail = getOrderById(id);
+	public OrderDetail cancelOrderById(Integer orderId) {
+		OrderDetail orderDetail = getOrderById(orderId);
 
 		List<OrderItem> allOrderItem = orderDetail.getItems();
 

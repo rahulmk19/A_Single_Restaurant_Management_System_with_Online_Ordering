@@ -5,27 +5,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.foodtaste.dto.UserDTO;
-import com.foodtaste.model.User;
-import com.foodtaste.service.UserService;
+import com.foodtaste.dto.UserRequest;
+import com.foodtaste.service.PublicAuthService;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@RequestMapping("/auth")
 @Slf4j
 public class PublicController {
 
 	@Autowired
-	private UserService userService;
+	private PublicAuthService publicAuthService;
 
-	@PostMapping
-	public ResponseEntity<UserDTO> createNewUser(@Valid @RequestBody User user) {
-		log.info("Received request to create user: {}", user);
+	@PostMapping("/register")
+	public ResponseEntity<String> createNewUser(@Valid @RequestBody UserRequest userRequest) {
+		log.info("Received request to create user: {}", userRequest);
 
-		UserDTO createdUser = userService.createUser(user);
+		String createdUser = publicAuthService.register(userRequest);
 		return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
 	}
+
+	@PostMapping("/login")
+	public ResponseEntity<String> loginUser(@Valid @RequestBody UserRequest userRequest) {
+		log.info("Received login request for email: {}", userRequest.getEmail());
+		
+		String jwtToken = publicAuthService.login(userRequest);
+		return new ResponseEntity<>(jwtToken, HttpStatus.OK);
+	}
+
 }

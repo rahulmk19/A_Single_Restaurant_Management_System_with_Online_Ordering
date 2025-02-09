@@ -31,8 +31,7 @@ public class OrderController {
 	private OrderDetailService orderDetailService;
 
 	@PostMapping("{id}")
-	public ResponseEntity<OrderResponse> placeOrder(@PathVariable Integer id,
-			@Valid @RequestBody OrderRequest request) {
+	public ResponseEntity<OrderResponse> placeOrder(@PathVariable String id, @Valid @RequestBody OrderRequest request) {
 		OrderResponse response = orderDetailService.createOrder(id, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}

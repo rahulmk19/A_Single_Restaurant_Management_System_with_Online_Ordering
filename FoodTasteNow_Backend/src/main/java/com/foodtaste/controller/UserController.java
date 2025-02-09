@@ -3,13 +3,11 @@ package com.foodtaste.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +38,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
+	public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
 		log.info("Received request to fetch user with ID: {}", id);
 
 		UserDTO user = userService.getUserById(id);
@@ -48,7 +46,7 @@ public class UserController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<UserDTO> updateUser(@PathVariable Integer id, @Valid @RequestBody User user) {
+	public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @Valid @RequestBody User user) {
 		log.info("Received request to update user with ID: {}", id);
 
 		UserDTO updatedUser = userService.updateUser(id, user);
@@ -56,7 +54,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
+	public ResponseEntity<Void> deleteUser(@PathVariable String id) {
 		log.info("Received request to delete user with ID: {}", id);
 
 		userService.deleteUser(id);

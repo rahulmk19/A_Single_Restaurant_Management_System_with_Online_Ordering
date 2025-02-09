@@ -1,10 +1,10 @@
-package com.edstem;
+package com.foodtaste;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EdstemTechnologiesProjectApplicationTests {
+class FoodTasteNowBackendApplicationTests {
 
 	@Test
 	void contextLoads() {

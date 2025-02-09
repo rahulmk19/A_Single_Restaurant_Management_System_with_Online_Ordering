@@ -9,16 +9,16 @@ import com.foodtaste.model.OrderDetail;
 
 public interface OrderDetailService {
 
-	OrderResponse createOrder(Integer userId, OrderRequest request);
+	OrderResponse createOrder(String userId, OrderRequest request);
 
-	OrderDetail getOrderById(Integer id);
+	OrderDetail getOrderById(Integer orderId);
 
-	OrderDetail getOrderByIdWithItems(Integer id);
+	OrderDetail getOrderByIdWithItems(Integer orderId);
 
 	List<OrderDetail> getAllOrders();
 
-	OrderDetail updateOrderStatus(Integer id, StatusEnum status);
+	OrderDetail updateOrderStatus(Integer orderId, StatusEnum status);
 
-	OrderDetail cancelOrderById(Integer id);
+	OrderDetail cancelOrderById(Integer orderId);
 
 }

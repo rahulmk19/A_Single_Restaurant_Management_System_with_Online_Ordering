@@ -2,5 +2,5 @@ package com.foodtaste.enums;
 
 public enum CategoryEnum {
 
-	APPETIZER, MAIN_COURSE, DESSERT;
+	Sweets, Milk_Based_Sweets, Sugar_Free_Sweets,Cakes;
 }

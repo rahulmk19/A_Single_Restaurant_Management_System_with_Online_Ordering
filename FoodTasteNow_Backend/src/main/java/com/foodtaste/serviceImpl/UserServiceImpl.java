@@ -1,10 +1,12 @@
 package com.foodtaste.serviceImpl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.foodtaste.dto.UserDTO;
@@ -26,6 +28,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ModelMapper modelMapper;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@Override
 	public UserDTO createUser(User user) {
 		log.info("Creating user with email: {} and mobile: {}", user.getEmail(), user.getMobileNumber());
@@ -44,7 +49,7 @@ public class UserServiceImpl implements UserService {
 			user.setRole(Role.USER);
 		}
 		User savedUser = userRepository.save(user);
-		log.info("User created successfully with ID: {}", savedUser.getId());
+		log.info("User created successfully with ID: {}", savedUser.getUuid());
 		return modelMapper.map(savedUser, UserDTO.class);
 	}
 
@@ -56,21 +61,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDTO getUserById(Integer id) {
-		log.info("Fetching user with ID: {}", id);
-		User user = userRepository.findById(id).orElseThrow(() -> {
-			log.warn("User not found with ID: {}", id);
-			return new UserException("User not found with ID: " + id);
+	public UserDTO getUserById(String uuid) {
+		log.info("Fetching user with ID: {}", uuid);
+		User user = userRepository.findById(uuid).orElseThrow(() -> {
+			log.warn("User not found with ID: {}", uuid);
+			return new UserException("User not found with ID: " + uuid);
 		});
 		return modelMapper.map(user, UserDTO.class);
 	}
 
 	@Override
-	public UserDTO updateUser(Integer id, User updatedUser) {
-		log.info("Updating user with ID: {}", id);
-		User user = userRepository.findById(id).orElseThrow(() -> {
-			log.warn("User not found with ID: {}", id);
-			return new UserException("User not found with ID: " + id);
+	public UserDTO updateUser(String uuid, User updatedUser) {
+		log.info("Updating user with ID: {}", uuid);
+		User user = userRepository.findById(uuid).orElseThrow(() -> {
+			log.warn("User not found with ID: {}", uuid);
+			return new UserException("User not found with ID: " + uuid);
 		});
 
 		if (userRepository.existsByEmail(updatedUser.getEmail()) && !user.getEmail().equals(updatedUser.getEmail())) {
@@ -85,24 +90,31 @@ public class UserServiceImpl implements UserService {
 		}
 
 		user.setName(updatedUser.getName());
-		user.setPassword(updatedUser.getPassword());
+		user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
 		user.setEmail(updatedUser.getEmail());
 		user.setMobileNumber(updatedUser.getMobileNumber());
 
 		User savedUser = userRepository.save(user);
-		log.info("User updated successfully with ID: {}", savedUser.getId());
+		log.info("User updated successfully with ID: {}", savedUser.getUuid());
 
 		return modelMapper.map(savedUser, UserDTO.class);
 	}
 
 	@Override
-	public void deleteUser(Integer id) {
-		log.info("Deleting user with ID: {}", id);
-		User user = userRepository.findById(id).orElseThrow(() -> {
-			log.warn("User not found with ID: {}", id);
-			return new UserException("User not found with ID: " + id);
+	public void deleteUser(String uuid) {
+		log.info("Soft Deleting user with ID: {}", uuid);
+		User user = userRepository.findById(uuid).orElseThrow(() -> {
+			log.warn("User not found with ID: {}", uuid);
+			return new UserException("User not found with ID: " + uuid);
 		});
-		userRepository.delete(user);
-		log.info("User deleted successfully with ID: {}", id);
+		user.setDeleted(true);
+		userRepository.save(user);
+		log.info("User soft deleted successfully with ID: {}", uuid);
 	}
+
+	@Override
+	public Optional<User> findByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
+
 }
