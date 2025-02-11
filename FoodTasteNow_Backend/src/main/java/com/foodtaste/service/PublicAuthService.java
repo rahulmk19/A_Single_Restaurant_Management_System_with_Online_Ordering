@@ -1,10 +1,11 @@
 package com.foodtaste.service;
 
+import com.foodtaste.dto.LoginRequest;
 import com.foodtaste.dto.UserRequest;
 
 public interface PublicAuthService {
 
-	String register(UserRequest request);
+	UserRequest register(UserRequest request);
 
-	String login(UserRequest request);
+	String login(LoginRequest request);
 }

@@ -1,6 +1,5 @@
 package com.foodtaste.enums;
 
 public enum CategoryEnum {
-
-	Sweets, Milk_Based_Sweets, Sugar_Free_Sweets,Cakes;
+	DESSERT, NORTH_INDIAN, SOUTH_INDIAN, CAKES, FAST_FOOD, STREET_FOOD, HEALTHY_DIET_FOOD, BEVERAGES;
 }

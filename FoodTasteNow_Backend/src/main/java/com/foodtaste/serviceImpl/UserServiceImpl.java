@@ -2,6 +2,7 @@ package com.foodtaste.serviceImpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService {
 		} else {
 			user.setRole(Role.USER);
 		}
+		user.setUuid(UUID.randomUUID().toString());
 		User savedUser = userRepository.save(user);
 		log.info("User created successfully with ID: {}", savedUser.getUuid());
 		return modelMapper.map(savedUser, UserDTO.class);

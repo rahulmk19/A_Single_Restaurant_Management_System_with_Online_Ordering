@@ -3,13 +3,18 @@ package com.foodtaste.security.jwt;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.foodtaste.model.User;
+import com.foodtaste.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,6 +25,9 @@ public class JwtUtility {
 
 	private final SecretKey secretKey;
 	private final long expiration;
+
+	@Autowired
+	private UserRepository userRepo;
 
 	public JwtUtility(@Value("${jwt.key}") String key, @Value("${jwt.expiration}") long expiration) {
 		this.secretKey = Keys.hmacShaKeyFor(key.getBytes());
@@ -54,6 +62,8 @@ public class JwtUtility {
 
 	public String generateToken(String username) {
 		Map<String, Object> claims = new HashMap<>();
+		Optional<User> user=userRepo.findByEmail(username);
+		claims.put("name", user.get().getName());
 		return createToken(claims, username);
 	}
 

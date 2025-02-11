@@ -1,6 +1,5 @@
 package com.foodtaste.config;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +9,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.foodtaste.security.jwt.JwtFilter;
 
@@ -29,35 +28,34 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				// Set session management to stateless (no HTTP session)
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				
-				// Disable CSRF as we are not using cookies (JWT based)
-				.csrf(AbstractHttpConfigurer::disable)
-				
-				// Configure CORS to allow your frontend application to communicate with this API	
-				.cors(cors -> cors.configurationSource(request -> {
-					CorsConfiguration cfg = new CorsConfiguration();
-					cfg.setAllowedOriginPatterns(Collections.singletonList("*")); // Allow all origins – adjust for production!
-					cfg.setAllowedMethods(Collections.singletonList("*")); // Allow all HTTP methods
-					cfg.setAllowedHeaders(Collections.singletonList("*")); // Allow all headers
-					cfg.setAllowCredentials(true); // Allow credentials (cookies, authorization headers, etc.)
-					cfg.setExposedHeaders(List.of("Authorization")); // Expose the Authorization header
-					return cfg;
-				}))
-				
-				
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/auth/**", "/index").permitAll()
-						.anyRequest().authenticated())
-				
-				// Add the custom JWT filter before the UsernamePasswordAuthenticationFilter in the filter chain
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(
+						auth -> auth
+								.requestMatchers("/foodtastenow/auth/register", "/foodtastenow/auth/login",
+										"foodtastenow/api/admin/items/getAll")
+								.permitAll().anyRequest().authenticated());
 
 		return http.build();
 	}
 
-	// Expose the AuthenticationManager for use in your authentication controller
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		config.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:5500")); // ✅ Allow frontend
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedHeaders(List.of("*"));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", config);
+		return source;
+	}
+
+	@Bean
+	public CorsFilter corsFilter() {
+		return new CorsFilter(corsConfigurationSource());
+	}
+
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
@@ -67,5 +65,4 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 }

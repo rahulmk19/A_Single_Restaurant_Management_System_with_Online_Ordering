@@ -18,7 +18,7 @@ public class UserRequest {
 	private String name;
 
 	@Email(message = "Invalid email format")
-	@NotBlank
+	@NotBlank(message = "Email must not be blank")
 	private String email;
 
 	@Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be 10 digits long")
