@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Menu Items</title>
+    <title>Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -101,9 +101,10 @@
 </head>
 
 <body class="bg-gray-100">
+    <!-- Navbar -->
     <div class="navbar">
         <div class="logo">
-            <a href="index.html" style="color: white; font-size: 20px; text-decoration: none">FoodTaste</a>
+            <a href="index.html">FoodTaste</a>
         </div>
         <div class="nav-links">
             <a href="index.html">Home</a>
@@ -114,23 +115,65 @@
             <button>Search</button>
         </div>
         <div class="auth">
+            <!-- This content will be updated dynamically -->
             <a href="User/login.html">Sign In</a>
         </div>
     </div>
 
     <div class="max-w-6xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
-        <!-- <h1 class="text-3xl font-bold text-center mb-6">Menu Items</h1> -->
-        <div id="menuItems" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
+        <div id="menuItems" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Menu items will be inserted here dynamically -->
+        </div>
     </div>
 
+    <!-- JavaScript -->
     <script>
-        // Object to track items in the cart
+
+        function getNameFromToken() {
+            const token = localStorage.getItem("jwtToken");
+            if (!token) return null;
+            try {
+                const payloadBase64 = token.split('.')[1];
+                const payload = JSON.parse(atob(payloadBase64));
+                // console.log("Decoded token payload:", payload);
+                return payload.name || payload.sub || null;
+            } catch (error) {
+                console.error("Error decoding token:", error);
+                return null;
+            }
+        }
+
+        function updateNavbar() {
+            const authDiv = document.querySelector(".auth");
+            const name = getNameFromToken();
+
+            if (name) {
+                authDiv.innerHTML = `
+      <span style="color: white; margin-right: 10px;">Hello, ${name}</span>
+      <a href="#" id="logout" style="color: white;">Logout</a>
+    `;
+
+                document.getElementById("logout").addEventListener("click", logout);
+            } else {
+                authDiv.innerHTML = `<a href="User/login.html" style="color: white;">Sign In</a>`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("jwtToken");
+            window.location.href = "index.html";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateNavbar();
+            fetchMenuItems();
+        });
+
         const cart = new Set();
 
-        // Function to fetch menu items from API
         async function fetchMenuItems() {
             try {
-                const response = await fetch("http://localhost:8081/items");
+                const response = await fetch("http://localhost:8081/foodtastenow/api/admin/items/getAll");
                 if (response.ok) {
                     const items = await response.json();
                     displayMenuItems(items);
@@ -142,44 +185,34 @@
             }
         }
 
-        // Function to display menu items on the page
         function displayMenuItems(items) {
             const menuItemsContainer = document.getElementById("menuItems");
             menuItemsContainer.innerHTML = "";
-
             items.forEach((item) => {
                 const itemCard = document.createElement("div");
-                itemCard.className =
-                    "bg-gray-50 border rounded-lg p-4 shadow hover:shadow-lg text-center";
-
+                itemCard.className = "bg-gray-50 border rounded-lg p-4 shadow hover:shadow-lg text-center";
                 itemCard.innerHTML = `
-              <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4">
-              <h2 class="text-xl font-bold mb-2">${item.name}</h2>
-              <p class="text-gray-700 mb-2">Category: ${item.category}</p>
-              <p class="text-gray-700 mb-4">Price: ₹${item.price.toFixed(2)}</p>
-              <button id="btn-${item.id}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                Add to Cart
-              </button>
-            `;
-
-                // Add click event to the button
+          <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+          <h2 class="text-xl font-bold mb-2">${item.name}</h2>
+          <p class="text-gray-700 mb-2">Category: ${item.category}</p>
+          <p class="text-gray-700 mb-4">Price: ₹${item.price.toFixed(2)}</p>
+          <button id="btn-${item.id}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+            Add to Cart
+          </button>
+        `;
                 const button = itemCard.querySelector(`#btn-${item.id}`);
                 button.addEventListener("click", () => toggleCartItem(item.id, button));
-
                 menuItemsContainer.appendChild(itemCard);
             });
         }
 
-        // Function to toggle item in the cart
         function toggleCartItem(itemId, button) {
             if (cart.has(itemId)) {
-                // Remove item from cart
                 cart.delete(itemId);
                 button.textContent = "Add to Cart";
                 button.classList.remove("bg-red-500", "hover:bg-red-600");
                 button.classList.add("bg-green-500", "hover:bg-green-600");
             } else {
-                // Add item to cart
                 cart.add(itemId);
                 button.textContent = "Remove from Cart";
                 button.classList.remove("bg-green-500", "hover:bg-green-600");
@@ -187,10 +220,11 @@
             }
         }
 
-        // Fetch and display menu items when the page loads
-        document.addEventListener("DOMContentLoaded", fetchMenuItems);
+        document.addEventListener("DOMContentLoaded", () => {
+            updateNavbar();
+            fetchMenuItems();
+        });
     </script>
-
 </body>
 
 </html>

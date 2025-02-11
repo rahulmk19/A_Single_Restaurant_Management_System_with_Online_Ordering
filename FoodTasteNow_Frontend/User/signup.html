@@ -77,7 +77,6 @@
         cursor: pointer;
         font-size: 16px;
         margin-left: 10px;
-        /* Space between input and button */
     }
 
     .navbar .search-bar button:hover {
@@ -243,29 +242,29 @@
                 return;
             }
 
-            // Call createUser function to send data to backend
             createUser(name, email, mobileNumber, password);
         });
 
         async function createUser(name, email, mobileNumber, password) {
             try {
-                let response = await fetch("http://localhost:8081/users", {
+                let response = await fetch("http://localhost:8081/foodtastenow/auth/register", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ name, email, mobileNumber, password }),
+                    mode: "cors",
                 });
 
-                let data = await response.json(); // Convert response to JSON
+                let data = await response.json();
 
                 if (response.ok) {
                     showMessage("success", "You have registered successfully! Redirecting...");
                     setTimeout(() => {
-                        window.location.href = "login.html"; // Redirect after success
+                        window.location.href = "login.html";
                     }, 2000);
                 } else {
-                    handleErrorMessage(data); // Handle backend errors
+                    handleErrorMessage(data);
                 }
             } catch (error) {
                 showMessage("error", "Network error: Please try again later.");

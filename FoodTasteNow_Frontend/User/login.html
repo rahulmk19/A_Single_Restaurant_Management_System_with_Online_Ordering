@@ -55,7 +55,8 @@
 
         .navbar .search-bar input[type="text"] {
             padding: 10px;
-            width: 500%;
+            width: 100%;
+            /* Fixed from 500% */
             border: 2px solid #ccc;
             border-radius: 30px;
             font-size: 16px;
@@ -97,7 +98,6 @@
         .navbar .auth a:hover {
             background-color: #4CAF50;
         }
-
 
         .form-container {
             box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(51, 51, 51) 0px 0px 0px 3px;
@@ -188,9 +188,9 @@
         </div>
     </div>
 
-
     <div class="form-container">
         <h2>Login</h2>
+
         <form id="loginForm">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required />
@@ -200,13 +200,16 @@
 
             <button type="submit">Login</button>
 
-            <div id="error-message" aria-live="assertive"></div>
+            <div id="error-message" aria-live="assertive" style="display: none;"></div>
+            <div id="success-message" aria-live="assertive" style="display: none;"></div>
         </form>
 
         <div class="link">
             <a href="signup.html">Don't have an account? Sign Up</a>
         </div>
     </div>
+
+
 
     <script>
         document.getElementById("loginForm").addEventListener("submit", async function (event) {
@@ -216,7 +219,7 @@
             let password = document.getElementById("password").value;
 
             try {
-                let response = await fetch("http://localhost:8081/login", {
+                let response = await fetch("http://localhost:8081/foodtastenow/auth/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -225,17 +228,30 @@
                 });
 
                 if (response.ok) {
-                    alert("Login successful!");
-                    window.location.href = "index.html";
+                    let token = await response.text();
+                    localStorage.setItem("jwtToken", token);
+
+                    document.getElementById("success-message").innerText = "Login successful! Redirecting...";
+                    document.getElementById("success-message").style.display = "block";
+                    document.getElementById("error-message").style.display = "none";
+
+                    setTimeout(() => {
+                        window.location.href = "../index.html";
+                    }, 2000);
                 } else {
                     let errorData = await response.json();
-                    document.getElementById("error-message").innerText = errorData.message || "Invalid credentials.";
+                    document.getElementById("error-message").innerText = errorData.message || "Invalid credentials. Please try again.";
                     document.getElementById("error-message").style.display = "block";
+
+                    document.getElementById("success-message").style.display = "none";
                 }
             } catch (error) {
-                alert("Network error: Please try again later.");
+                document.getElementById("error-message").innerText = "Network error: Please try again later.";
+                document.getElementById("error-message").style.display = "block";
+                document.getElementById("success-message").style.display = "none";
             }
         });
+
     </script>
 </body>
 
