@@ -36,14 +36,6 @@ public class OrderDetail {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@NotBlank
-	@Size(min = 4, max = 30, message = "Customer name should be greater than 4")
-	private String customerName;
-
-	@NotBlank
-	@Size(min = 10, max = 10, message = "Phone number should be 10 digit number")
-	private String customerPhone;
-
 	private BigDecimal totalAmount;
 
 	private Integer quantity;
@@ -57,7 +49,7 @@ public class OrderDetail {
 	@OneToMany(mappedBy = "orderDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //	@JsonManagedReference
 	private List<OrderItem> items;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user; // This creates a unidirectional relationship

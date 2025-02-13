@@ -9,11 +9,6 @@ import lombok.Data;
 
 @Data
 public class OrderRequest {
-	@NotBlank(message = "Customer name cannot be blank")
-	private String customerName;
-
-	@NotBlank(message = "Customer phone cannot be blank")
-	private String customerPhone;
 
 //	@NotNull
 //	private Integer userId;

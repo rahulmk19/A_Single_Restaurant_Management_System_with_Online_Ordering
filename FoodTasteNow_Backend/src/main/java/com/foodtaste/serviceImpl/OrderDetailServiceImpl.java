@@ -56,8 +56,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 				.orElseThrow(() -> new UserException("User not found with id: " + userId));
 
 		OrderDetail orderDetail = new OrderDetail();
-		orderDetail.setCustomerName(user.getName());
-		orderDetail.setCustomerPhone(user.getMobileNumber());
 		orderDetail.setStatus(StatusEnum.RECEIVED);
 		orderDetail.setCreatedAt(LocalDateTime.now());
 		orderDetail.setUser(user);
