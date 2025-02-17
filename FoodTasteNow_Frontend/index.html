@@ -1,340 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FoodTaste / Home</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      integrity="sha512-Fo3rlrZj/k7ujTnHqT7LKy2tT1Y4B6L5O/6x3Z4I3V9B+4uX1Rm2B0s1KjF9xzp2KVVjvbHAfO9wDVWD1Z5gXg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        height: 90vh;
-      }
-
-      .navbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #333;
-        color: white;
-        padding: 10px 20px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
-      }
-
-      .navbar .nav-links {
-        display: flex;
-        gap: 15px;
-      }
-
-      .navbar .nav-links a {
-        color: white;
-        text-decoration: none;
-        font-weight: bold;
-        padding: 5px 10px;
-        border-radius: 5px;
-      }
-
-      .navbar .nav-links a:hover {
-        background-color: #4caf50;
-      }
-
-      .navbar .search-bar {
-        display: flex;
-        align-items: center;
-        max-width: 60%;
-        width: 100%;
-        position: relative;
-      }
-
-      .navbar .search-bar input[type="text"] {
-        padding: 10px;
-        width: 500%;
-        border: 2px solid #ccc;
-        border-radius: 30px;
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.3s;
-      }
-
-      .navbar .search-bar input[type="text"]:focus {
-        border-color: #4caf50;
-      }
-
-      .navbar .search-bar button {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        padding: 10px 15px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-left: 10px;
-      }
-
-      .navbar .search-bar button:hover {
-        background-color: #d09143;
-      }
-
-      .navbar .auth {
-        display: flex;
-        align-items: center;
-      }
-
-      .navbar .auth a {
-        color: white;
-        font-weight: bold;
-        padding: 5px 10px;
-        border-radius: 5px;
-      }
-
-      .navbar .auth a:hover {
-        background-color: #4caf50;
-      }
-
-      /* Dropdown Behaviour */
-      .relative {
-        position: relative;
-      }
-
-      .dropdown-menu {
-        position: absolute;
-        right: 0;
-        top: 100%;
-        /* background: #fff; */
-        background: grey;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        width: 12rem;
-        z-index: 1000;
-        display: none;
-      }
-
-      .dropdown-menu a {
-        display: block;
-        padding: 0.5rem 1rem;
-        color: #333;
-        text-decoration: none;
-        /* background: transparent; */
-      }
-
-      .dropdown-menu a:hover {
-        background: #f3f3f3;
-      }
-
-      .open .dropdown-menu {
-        display: block;
-      }
-    </style>
-  </head>
-
-  <body class="bg-gray-100">
-    <!-- Navbar -->
-    <div class="navbar flex items-center justify-between p-4 bg-blue-600">
-      <div class="flex items-center space-x-4">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoodTasteNow - Home</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    integrity="sha512-Fo3rlrZj/k7ujTnHqT7LKy2tT1Y4B6L5O/6x3Z4I3V9B+4uX1Rm2B0s1KjF9xzp2KVVjvbHAfO9wDVWD1Z5gXg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Dropdown styling */
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      background-color: white;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      z-index: 50;
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+    .dropdown-menu a:hover {
+      background-color: #f1f1f1;
+    }
+    .open .dropdown-menu {
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <nav class="bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-6">
         <div class="logo">
-          <a href="index.html" class="text-white font-bold text-xl"
-            >FoodTaste</a
-          >
+          <a href="index.html" class="text-white font-extrabold text-3xl tracking-wide">FoodTasteNow</a>
         </div>
-        <div class="nav-links flex space-x-4" id="navLinks">
-          <a href="index.html" class="text-white">Home</a>
-          <a href="products.html" class="text-white">Products</a>
-          <!-- The Cart button will be injected here if the user is logged in -->
+        <div class="nav-links hidden md:flex space-x-4" id="navLinks">
+          <a href="index.html" class="text-white hover:text-gray-200">Home</a>
+          <a href="category.html" class="text-white hover:text-gray-200">Category</a>
         </div>
       </div>
       <div class="flex items-center space-x-4">
-        <div class="search-bar">
-          <input
-            type="text"
-            placeholder="Search products..."
-            class="px-2 py-1 rounded"
-          />
-          <button class="px-3 py-1 rounded bg-white text-blue-600">
-            Search
-          </button>
+        <div class="search-bar hidden md:flex">
+          <input type="text" placeholder="Search products..." id="searchInput" class="px-3 py-2 rounded-l-lg border focus:outline-none" />
+          <button onclick="searchItems()" class="px-4 py-2 bg-white text-red-500 rounded-r-lg hover:bg-red-100">Search</button>
         </div>
         <div class="auth" id="authSection">
-          <!-- This content will be updated dynamically -->
           <a href="User/login.html" class="text-white">Sign In</a>
         </div>
+        <!-- Mobile Hamburger -->
+        <button class="md:hidden text-white focus:outline-none" onclick="toggleMobileMenu()">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
       </div>
     </div>
+  </nav>
+  <!-- Mobile Menu -->
+  <div class="mobile-menu hidden md:hidden bg-red-500 text-white p-4" id="mobileMenu">
+    <a href="index.html" class="block py-2">Home</a>
+    <a href="category.html" class="block py-2">Category</a>
+    <a href="User/login.html" class="block py-2">Sign In</a>
+  </div>
 
-    <!-- Page content -->
-    <div class="max-w-6xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
-      <div id="menuItems" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <!-- Menu items will be inserted here dynamically -->
-      </div>
+  <!-- Page Content -->
+  <div class="max-w-6xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+    <div id="menuItems" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Menu items will be dynamically inserted here -->
     </div>
+  </div>
 
-    <script>
-      function getNameFromToken() {
-        const token = localStorage.getItem("jwtToken");
-        if (!token) return null;
-        try {
-          const payloadBase64 = token.split(".")[1];
-          const payload = JSON.parse(atob(payloadBase64));
-          return payload.name || payload.sub || null;
-        } catch (error) {
-          console.error("Error decoding token:", error);
-          return null;
-        }
+  <script>
+    // Toggle Mobile Menu
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById("mobileMenu");
+      mobileMenu.classList.toggle("hidden");
+    }
+
+    // Retrieve user name from token (if logged in)
+    function getNameFromToken() {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) return null;
+      try {
+        const payloadBase64 = token.split(".")[1];
+        const payload = JSON.parse(atob(payloadBase64));
+        return payload.name || payload.sub || null;
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        return null;
+      }
+    }
+
+    // Update Navbar based on login status
+    function updateNavbar() {
+      const authDiv = document.getElementById("authSection");
+      const name = getNameFromToken();
+
+      // Remove any existing Cart button if present
+      const existingCartButton = document.getElementById("cartButton");
+      if (existingCartButton) {
+        existingCartButton.remove();
       }
 
-      function updateNavbar() {
-        const authDiv = document.getElementById("authSection");
-        const name = getNameFromToken();
-
-        // Remove any existing Cart button if present
-        const existingCartButton = document.getElementById("cartButton");
-        if (existingCartButton) {
-          existingCartButton.remove();
-        }
-
-        if (name) {
-          // Place the user dropdown and Cart button together inside a flex container
-          authDiv.innerHTML = `
-      <div class="flex items-center space-x-4">
-        <div class="relative inline-block" id="userDropdownContainer">
-          <button id="userDropdownButton" class="text-white focus:outline-none inline-flex items-center">
-            <span>${name}</span>
-            <i class="fas fa-caret-down ml-1"></i>
-          </button>
-          <div id="userDropdown" class="dropdown-menu">
-            <a href="profile.html">My Profile</a>
-            <a href="orders.html">Orders</a>
-            <a href="coupons.html">Coupon</a>
-            <a href="notifications.html">Notifications</a>
-            <a href="#" id="logout">Logout</a>
+      if (name) {
+        authDiv.innerHTML = `
+          <div class="flex items-center space-x-4">
+            <div class="relative inline-block" id="userDropdownContainer">
+              <button id="userDropdownButton" class="text-white focus:outline-none inline-flex items-center">
+                <span>${name}</span>
+                <i class="fas fa-caret-down ml-1"></i>
+              </button>
+              <div id="userDropdown" class="dropdown-menu">
+                <a href="profile.html">My Profile</a>
+                <a href="orders.html">Orders</a>
+                <a href="coupons.html">Coupon</a>
+                <a href="notifications.html">Notifications</a>
+                <a href="#" id="logout">Logout</a>
+              </div>
+            </div>
+            <a id="cartButton" href="cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
+              <i class="fas fa-shopping-cart text-2xl"></i>
+              <span class="text-lg font-normal">Cart</span>
+            </a>
           </div>
-        </div>
-
-        <a id="cartButton" href="cart.html" class="ml-auto w-3/4 bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
-            <i class="fas fa-shopping-cart text-2xl"></i>
-            <span class="text-lg font-normal">Cart</span>
-        </a>
-
-      </div>
-    `;
-
-          const dropdownContainer = document.getElementById(
-            "userDropdownContainer"
-          );
-          dropdownContainer.addEventListener("mouseenter", () => {
-            dropdownContainer.classList.add("open");
-          });
-          dropdownContainer.addEventListener("mouseleave", () => {
-            dropdownContainer.classList.remove("open");
-          });
-
-          // Add logout functionality from within the dropdown
-          document.getElementById("logout").addEventListener("click", (e) => {
-            e.preventDefault();
-            logout();
-          });
-        } else {
-          authDiv.innerHTML = `<a href="User/login.html" class="text-white">Sign In</a>`;
-        }
-      }
-
-      // Log out functionality
-      function logout() {
-        localStorage.removeItem("jwtToken");
-        window.location.href = "index.html";
-      }
-
-      // Fetch menu items from the backend
-      async function fetchMenuItems() {
-        try {
-          const response = await fetch(
-            "http://localhost:8081/foodtastenow/api/admin/items/getAll"
-          );
-          if (response.ok) {
-            const items = await response.json();
-            displayMenuItems(items);
-          } else {
-            console.error("Failed to fetch menu items");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      }
-
-      // Display menu items and create a single button per item based on login status
-      function displayMenuItems(items) {
-        const menuItemsContainer = document.getElementById("menuItems");
-        menuItemsContainer.innerHTML = "";
-        const isLoggedIn = getNameFromToken() !== null;
-        items.forEach((item) => {
-          const itemCard = document.createElement("div");
-          itemCard.className =
-            "bg-gray-50 border rounded-lg p-4 shadow hover:shadow-lg text-center";
-          itemCard.innerHTML = `
-          <img src="${item.imageUrl}" alt="${
-            item.name
-          }" class="w-full h-48 object-cover rounded-lg mb-4">
-          <h2 class="text-xl font-bold mb-2">${item.name}</h2>
-          <p class="text-gray-700 mb-2">Category: ${item.category}</p>
-          <p class="text-gray-700 mb-4">Price: ₹${item.price.toFixed(2)}</p>
         `;
-
-          // Create a single button for adding to cart
-          const cartButton = document.createElement("button");
-          cartButton.className =
-            "bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600";
-          cartButton.textContent = "Add to Cart";
-          if (isLoggedIn) {
-            cartButton.addEventListener("click", () =>
-              toggleCartItem(item.id, cartButton)
-            );
-          } else {
-            // If not logged in, clicking the button redirects to login page
-            cartButton.addEventListener("click", () => {
-              window.location.href = "User/login.html";
-            });
-          }
-          itemCard.appendChild(cartButton);
-          menuItemsContainer.appendChild(itemCard);
+        const dropdownContainer = document.getElementById("userDropdownContainer");
+        dropdownContainer.addEventListener("mouseenter", () => {
+          dropdownContainer.classList.add("open");
         });
+        dropdownContainer.addEventListener("mouseleave", () => {
+          dropdownContainer.classList.remove("open");
+        });
+        document.getElementById("logout").addEventListener("click", (e) => {
+          e.preventDefault();
+          logout();
+        });
+      } else {
+        authDiv.innerHTML = `<a href="User/login.html" class="text-white">Sign In</a>`;
       }
+    }
 
-      const cart = new Set();
-      function toggleCartItem(itemId, button) {
-        if (cart.has(itemId)) {
-          cart.delete(itemId);
-          button.textContent = "Add to Cart";
-          button.classList.remove("bg-red-500", "hover:bg-red-600");
-          button.classList.add("bg-green-500", "hover:bg-green-600");
+    // Log out functionality
+    function logout() {
+      localStorage.removeItem("jwtToken");
+      window.location.href = "index.html";
+    }
+
+    // Fetch menu items from backend
+    async function fetchMenuItems() {
+      try {
+        const response = await fetch("http://localhost:8081/foodtastenow/api/admin/items/getAll");
+        if (response.ok) {
+          const items = await response.json();
+          displayMenuItems(items);
         } else {
-          cart.add(itemId);
-          button.textContent = "Remove from Cart";
-          button.classList.remove("bg-green-500", "hover:bg-green-600");
-          button.classList.add("bg-red-500", "hover:bg-red-600");
+          console.error("Failed to fetch menu items");
         }
+      } catch (error) {
+        console.error("Error:", error);
       }
-      function searchItems() {
-        const query = document.getElementById("searchInput").value;
-        fetchMenuItems(query);
-      }
+    }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        updateNavbar();
-        fetchMenuItems();
+    // Display menu items in a responsive grid
+    function displayMenuItems(items) {
+      const menuItemsContainer = document.getElementById("menuItems");
+      menuItemsContainer.innerHTML = "";
+      const isLoggedIn = getNameFromToken() !== null;
+      items.forEach((item) => {
+        const itemCard = document.createElement("div");
+        itemCard.className = "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
+        itemCard.innerHTML = `
+          <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+          <h2 class="text-xl font-bold mb-2 text-gray-800">${item.name}</h2>
+          <p class="text-gray-600 mb-2">Category: ${item.category}</p>
+          <p class="text-red-500 text-lg font-semibold mb-4">₹${item.price.toFixed(2)}</p>
+        `;
+        const cartButton = document.createElement("button");
+        cartButton.className = "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors";
+        cartButton.textContent = "Add to Cart";
+        if (isLoggedIn) {
+          cartButton.addEventListener("click", () => toggleCartItem(item.id, cartButton));
+        } else {
+          cartButton.addEventListener("click", () => {
+            window.location.href = "User/login.html";
+          });
+        }
+        itemCard.appendChild(cartButton);
+        menuItemsContainer.appendChild(itemCard);
       });
-    </script>
-  </body>
+    }
+
+    const cart = new Set();
+    function toggleCartItem(itemId, button) {
+      if (cart.has(itemId)) {
+        cart.delete(itemId);
+        button.textContent = "Add to Cart";
+        button.classList.remove("bg-red-500", "hover:bg-red-600");
+        button.classList.add("bg-blue-500", "hover:bg-blue-600");
+      } else {
+        cart.add(itemId);
+        button.textContent = "Remove from Cart";
+        button.classList.remove("bg-blue-500", "hover:bg-blue-600");
+        button.classList.add("bg-red-500", "hover:bg-red-600");
+      }
+    }
+
+    // Basic search (can be enhanced for live filtering)
+    function searchItems() {
+      fetchMenuItems();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateNavbar();
+      fetchMenuItems();
+    });
+  </script>
+</body>
 </html>
