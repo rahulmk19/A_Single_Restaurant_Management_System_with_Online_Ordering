@@ -1,149 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FoodTaste - Sign Up</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    integrity="sha512-Fo3rlrZj/k7ujTnHqT7LKy2tT1Y4B6L5O/6x3Z4I3V9B+4uX1Rm2B0s1KjF9xzp2KVVjvbHAfO9wDVWD1Z5gXg=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen" style="background-image: url('https://wallpapercave.com/wp/wp9277538.jpg'); background-size: cover; background-position: center;">
-  <!-- Navbar -->
-  <nav class="bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="logo">
-        <a href="index.html" class="text-white font-extrabold text-3xl tracking-wide">FoodTaste</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FoodTasteNow - Sign Up</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHqT7LKy2tT1Y4B6L5O/6x3Z4I3V9B+4uX1Rm2B0s1KjF9xzp2KVVjvbHAfO9wDVWD1Z5gXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="min-h-screen"
+    style="
+      background-image: url('https://wallpapercave.com/wp/wp9277538.jpg');
+      background-size: cover;
+      background-position: center;
+    "
+  >
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="logo">
+          <a
+            href="../index.html"
+            class="text-white font-extrabold text-3xl tracking-wide"
+            >FoodTasteNow</a
+          >
+        </div>
+        <div class="hidden md:flex space-x-4">
+          <a href="../index.html" class="text-white hover:text-gray-200"
+            >Home</a
+          >
+          <a href="../category.html" class="text-white hover:text-gray-200"
+            >Category</a
+          >
+        </div>
+        <div class="hidden md:flex">
+          <a href="login.html" class="text-white hover:text-gray-200"
+            >Sign In</a
+          >
+        </div>
+        <!-- Mobile Hamburger (optional) -->
+        <button class="md:hidden text-white focus:outline-none">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
       </div>
-      <div class="hidden md:flex space-x-4">
-        <a href="index.html" class="text-white hover:text-gray-200">Home</a>
-        <a href="products.html" class="text-white hover:text-gray-200">Products</a>
+    </nav>
+
+    <!-- Sign Up Form Container -->
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div
+        class="bg-white bg-opacity-90 max-w-md w-full p-8 rounded-lg shadow-lg"
+      >
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
+          Sign Up
+        </h2>
+        <form id="createUserForm" class="space-y-4">
+          <div>
+            <label for="name" class="block text-gray-700"
+              >Enter Full Name</label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+            />
+          </div>
+          <div>
+            <label for="email" class="block text-gray-700">Enter Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+            />
+          </div>
+          <div>
+            <label for="mobileNumber" class="block text-gray-700"
+              >Enter Mobile Number</label
+            >
+            <input
+              type="text"
+              id="mobileNumber"
+              name="mobileNumber"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+            />
+          </div>
+          <div>
+            <label for="password" class="block text-gray-700"
+              >Enter Password</label
+            >
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors"
+          >
+            Register
+          </button>
+          <div
+            id="error-message"
+            class="text-red-600 text-center"
+            style="display: none"
+          ></div>
+          <div
+            id="success-message"
+            class="text-green-600 text-center"
+            style="display: none"
+          ></div>
+        </form>
+        <div class="mt-6 text-center">
+          <a
+            href="login.html"
+            class="text-blue-500 hover:text-blue-700 font-semibold"
+            >Already have an account? Sign In</a
+          >
+        </div>
       </div>
-      <div class="hidden md:flex">
-        <a href="login.html" class="text-white hover:text-gray-200">Sign In</a>
-      </div>
-      <!-- Mobile Hamburger (optional) -->
-      <button class="md:hidden text-white focus:outline-none">
-        <i class="fas fa-bars text-2xl"></i>
-      </button>
     </div>
-  </nav>
-  
-  <!-- Sign Up Form Container -->
-  <div class="flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white bg-opacity-90 max-w-md w-full p-8 rounded-lg shadow-lg">
-      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Sign Up</h2>
-      <form id="createUserForm" class="space-y-4">
-        <div>
-          <label for="name" class="block text-gray-700">Enter Full Name</label>
-          <input type="text" id="name" name="name" required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500" />
-        </div>
-        <div>
-          <label for="email" class="block text-gray-700">Enter Email</label>
-          <input type="email" id="email" name="email" required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500" />
-        </div>
-        <div>
-          <label for="mobileNumber" class="block text-gray-700">Enter Mobile Number</label>
-          <input type="text" id="mobileNumber" name="mobileNumber" required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500" />
-        </div>
-        <div>
-          <label for="password" class="block text-gray-700">Enter Password</label>
-          <input type="password" id="password" name="password" required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500" />
-        </div>
-        <button type="submit"
-          class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors">Register</button>
-        <div id="error-message" class="text-red-600 text-center" style="display: none;"></div>
-        <div id="success-message" class="text-green-600 text-center" style="display: none;"></div>
-      </form>
-      <div class="mt-6 text-center">
-        <a href="login.html" class="text-blue-500 hover:text-blue-700 font-semibold">Already have an account? Sign In</a>
-      </div>
-    </div>
-  </div>
-  
-  <script>
-    document.getElementById("createUserForm").addEventListener("submit", function(event) {
-      event.preventDefault();
 
-      let name = document.getElementById("name").value.trim();
-      let email = document.getElementById("email").value.trim();
-      let mobileNumber = document.getElementById("mobileNumber").value.trim();
-      let password = document.getElementById("password").value;
+    <script>
+      document
+        .getElementById("createUserForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
 
-      let errorMessage = [];
+          let name = document.getElementById("name").value.trim();
+          let email = document.getElementById("email").value.trim();
+          let mobileNumber = document
+            .getElementById("mobileNumber")
+            .value.trim();
+          let password = document.getElementById("password").value;
 
-      if (name.length < 3) {
-        errorMessage.push("Name should be at least 3 characters long.");
-      }
-      if (!/^\S+@\S+\.\S+$/.test(email)) {
-        errorMessage.push("Invalid email format.");
-      }
-      if (!/^\d{10}$/.test(mobileNumber)) {
-        errorMessage.push("Mobile number must be exactly 10 digits.");
-      }
-      if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(password)) {
-        errorMessage.push("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
-      }
+          let errorMessage = [];
 
-      if (errorMessage.length > 0) {
-        showMessage("error", errorMessage.map(msg => `<p>${msg}</p>`).join(""));
-        return;
-      }
+          if (name.length < 3) {
+            errorMessage.push("Name should be at least 3 characters long.");
+          }
+          if (!/^\S+@\S+\.\S+$/.test(email)) {
+            errorMessage.push("Invalid email format.");
+          }
+          if (!/^\d{10}$/.test(mobileNumber)) {
+            errorMessage.push("Mobile number must be exactly 10 digits.");
+          }
+          if (
+            password.length < 8 ||
+            !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(password)
+          ) {
+            errorMessage.push(
+              "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+            );
+          }
 
-      createUser(name, email, mobileNumber, password);
-    });
+          if (errorMessage.length > 0) {
+            showMessage(
+              "error",
+              errorMessage.map((msg) => `<p>${msg}</p>`).join("")
+            );
+            return;
+          }
 
-    async function createUser(name, email, mobileNumber, password) {
-      try {
-        let response = await fetch("http://localhost:8081/foodtastenow/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, mobileNumber, password }),
-          mode: "cors",
+          createUser(name, email, mobileNumber, password);
         });
 
-        let data = await response.json();
+      async function createUser(name, email, mobileNumber, password) {
+        try {
+          let response = await fetch(
+            "http://localhost:8081/foodtastenow/auth/register",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, email, mobileNumber, password }),
+              mode: "cors",
+            }
+          );
 
-        if (response.ok) {
-          showMessage("success", "You have registered successfully! Redirecting...");
-          setTimeout(() => {
-            window.location.href = "login.html";
-          }, 2000);
-        } else {
-          handleErrorMessage(data);
+          let data = await response.json();
+
+          if (response.ok) {
+            showMessage(
+              "success",
+              "You have registered successfully! Redirecting..."
+            );
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 2000);
+          } else {
+            handleErrorMessage(data);
+          }
+        } catch (error) {
+          showMessage("error", "Network error: Please try again later.");
         }
-      } catch (error) {
-        showMessage("error", "Network error: Please try again later.");
       }
-    }
 
-    function handleErrorMessage(errorData) {
-      if (errorData && errorData.errors) {
-        showMessage("error", errorData.errors.map(err => `<p>${err}</p>`).join(""));
-      } else if (errorData && errorData.message) {
-        showMessage("error", `<p>${errorData.message}</p>`);
-      } else {
-        showMessage("error", "Something went wrong. Please try again.");
+      function handleErrorMessage(errorData) {
+        if (errorData && errorData.errors) {
+          showMessage(
+            "error",
+            errorData.errors.map((err) => `<p>${err}</p>`).join("")
+          );
+        } else if (errorData && errorData.message) {
+          showMessage("error", `<p>${errorData.message}</p>`);
+        } else {
+          showMessage("error", "Something went wrong. Please try again.");
+        }
       }
-    }
 
-    function showMessage(type, message) {
-      let element = document.getElementById(type === "error" ? "error-message" : "success-message");
-      element.innerHTML = message;
-      element.style.display = "block";
+      function showMessage(type, message) {
+        let element = document.getElementById(
+          type === "error" ? "error-message" : "success-message"
+        );
+        element.innerHTML = message;
+        element.style.display = "block";
 
-      let otherElement = document.getElementById(type === "error" ? "success-message" : "error-message");
-      otherElement.style.display = "none";
-    }
-  </script>
-</body>
+        let otherElement = document.getElementById(
+          type === "error" ? "success-message" : "error-message"
+        );
+        otherElement.style.display = "none";
+      }
+    </script>
+  </body>
 </html>
