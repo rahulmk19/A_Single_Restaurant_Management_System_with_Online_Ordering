@@ -9,5 +9,5 @@ import com.foodtaste.model.User;
 
 public interface CartRepository extends JpaRepository<Cart, Integer> {
 
-	Optional<Cart> findByUserAndCheckedOutFalse(User user);
+	Optional<Cart> findByUserAndCheckout(User user, boolean checkout);
 }
