@@ -5,13 +5,13 @@ import com.foodtaste.model.MenuItem;
 
 public interface CartService {
 
-	Cart addItemToCart(String userId, Integer menuItemId, int quantity);
+	Cart addItemToCart(String userId, Integer menuItemId);
 	
 	void removeItemFromCart(String userId, Integer cartItemId);
 	
 	Cart checkoutCart(String userId);
 
-	Cart updateCartItem(String userId, Integer menuItemId, int newQuantity);
+	Cart updateCartItemQuantity(String userId, Integer menuItemId, int newQuantity);
 
 	Cart clearCart(String userId);
 	

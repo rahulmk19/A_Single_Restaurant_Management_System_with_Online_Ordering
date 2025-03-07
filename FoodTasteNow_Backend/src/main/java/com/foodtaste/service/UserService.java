@@ -3,21 +3,22 @@ package com.foodtaste.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.foodtaste.dto.UserDTO;
+import com.foodtaste.dto.UserRequestDTO;
+import com.foodtaste.dto.UserResponseDTO;
 import com.foodtaste.model.User;
 
 public interface UserService {
 
-	UserDTO createUser(User user);
+	void initRoleAndUsers();
 
-	List<UserDTO> getAllUsers();
+	UserResponseDTO createNewUser(UserRequestDTO userRequestDTO);
 
-	UserDTO getUserById(String uuid);
+	List<UserResponseDTO> getAllUsers();
 
-	Optional<User> findByEmail(String email);
+	UserResponseDTO getUserById(Long userId);
 
-	UserDTO updateUser(String uuid, User updatedUser);
+	UserResponseDTO updateUser(Long userId, UserRequestDTO userRequestDTO);
 
-	void deleteUser(String uuid);
-	
+	String deleteUser(Long userId);
+
 }

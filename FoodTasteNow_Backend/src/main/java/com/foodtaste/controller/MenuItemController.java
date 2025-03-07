@@ -24,55 +24,55 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping(AppConstants.APP_NAME + AppConstants.PRIVATE_ROUTE_TYPE + "/admin/items")
+@RequestMapping(AppConstants.APP_NAME + "/items")
 @Slf4j
 @CrossOrigin(origins = "*")
 public class MenuItemController {
 
-    @Autowired
-    private MenuItemService menuItemService;
+	@Autowired
+	private MenuItemService menuItemService;
 
-    @PostMapping(AppConstants.SAVE)
-    public ResponseEntity<MenuItem> addMenuItem(@Valid @RequestBody MenuItem menuItem) {
-        log.info("Request to add menu item : {}", menuItem);
+	@PostMapping(AppConstants.ADMIN + AppConstants.SAVE)
+	public ResponseEntity<MenuItem> addMenuItem(@Valid @RequestBody MenuItem menuItem) {
+		log.info("Request to add menu item : {}", menuItem);
 
-        MenuItem item = menuItemService.createItem(menuItem);
-        return new ResponseEntity<>(item, HttpStatus.CREATED);
-    }
+		MenuItem item = menuItemService.createItem(menuItem);
+		return new ResponseEntity<>(item, HttpStatus.CREATED);
+	}
 
-    @GetMapping(AppConstants.GET_BY_ID + "/{id}")
-    public ResponseEntity<MenuItem> getItemById(@PathVariable Integer id) {
-        log.info("Request to get item : {}", id);
+	@GetMapping(AppConstants.ADMIN + AppConstants.GET_BY_ID + "/{id}")
+	public ResponseEntity<MenuItem> getItemById(@PathVariable Integer id) {
+		log.info("Request to get item : {}", id);
 
-        MenuItem menuItem = menuItemService.getItemById(id);
-        return ResponseEntity.ok(menuItem);
-    }
+		MenuItem menuItem = menuItemService.getItemById(id);
+		return ResponseEntity.ok(menuItem);
+	}
 
-    @GetMapping(AppConstants.GET_ALL + "/search")
-    public ResponseEntity<MenuItem> findMenuItemByName(@RequestParam(required = true) String name) {
-        log.info("Request to get item by name : {}", name);
-        MenuItem menuItem = menuItemService.findByName(name);
-        return ResponseEntity.ok(menuItem);
-    }
+	@GetMapping(AppConstants.ADMIN + "/search")
+	public ResponseEntity<MenuItem> findMenuItemByName(@RequestParam(required = true) String name) {
+		log.info("Request to get item by name : {}", name);
+		MenuItem menuItem = menuItemService.findByName(name);
+		return ResponseEntity.ok(menuItem);
+	}
 
-    @PutMapping(AppConstants.UPDATE + "/{id}")
-    public ResponseEntity<MenuItem> updateMenuItem(@PathVariable Integer id, @Valid @RequestBody MenuItem menuItem) {
-        log.info("Request to update menu item : {}", menuItem);
-        MenuItem item = menuItemService.updateItem(id, menuItem);
-        return new ResponseEntity<>(item, HttpStatus.OK);
-    }
+	@PutMapping(AppConstants.ADMIN + AppConstants.UPDATE + "/{id}")
+	public ResponseEntity<MenuItem> updateMenuItem(@PathVariable Integer id, @Valid @RequestBody MenuItem menuItem) {
+		log.info("Request to update menu item : {}", menuItem);
+		MenuItem item = menuItemService.updateItem(id, menuItem);
+		return new ResponseEntity<>(item, HttpStatus.OK);
+	}
 
-    @GetMapping(AppConstants.GET_ALL)
-    public ResponseEntity<List<MenuItem>> getAllItems() {
-        log.info("Request to Get All menu items");
-        List<MenuItem> items = menuItemService.getAllItem();
-        return ResponseEntity.ok(items);
-    }
+	@GetMapping(AppConstants.PUBLIC_ROUTE_TYPE + AppConstants.GET_ALL)
+	public ResponseEntity<List<MenuItem>> getAllItems() {
+		log.info("Request to Get All menu items");
+		List<MenuItem> items = menuItemService.getAllItem();
+		return ResponseEntity.ok(items);
+	}
 
-    @DeleteMapping(AppConstants.DELETE + "/{id}")
-    public ResponseEntity<String> deleteItem(@PathVariable Integer id) {
-        log.info("Request to delete item : {}", id);
-        String deletedItem = menuItemService.deleteItem(id);
-        return new ResponseEntity<>(deletedItem, HttpStatus.OK);
-    }
+	@DeleteMapping(AppConstants.ADMIN + AppConstants.DELETE + "/{id}")
+	public ResponseEntity<String> deleteItem(@PathVariable Integer id) {
+		log.info("Request to delete item : {}", id);
+		String deletedItem = menuItemService.deleteItem(id);
+		return new ResponseEntity<>(deletedItem, HttpStatus.OK);
+	}
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.foodtaste.enums.StatusEnum;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,11 +17,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,22 +35,28 @@ public class OrderDetail {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private BigDecimal totalAmount;
+	private BigDecimal totalOrderAmount;
 
-	private Integer quantity;
+	private Integer totalOrderQuantity;
 
+	private String customerName;
+	private String customerAddress;
+	private String contactNum;
+	private String alternateContactNum;
+
+	@Column(length = 20)
 	@Enumerated(EnumType.STRING)
 	private StatusEnum status;
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime createdAt;
+	private LocalDateTime createdAtTime;
 
 	@OneToMany(mappedBy = "orderDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //	@JsonManagedReference
 	private List<OrderItem> items;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@OneToOne
 	@JoinColumn(name = "user_id")
-	private User user; // This creates a unidirectional relationship
+	private User user;
 
 }

@@ -4,8 +4,9 @@ public interface AppConstants {
 
 	String APP_NAME = "/foodtastenow";
 	String Auth = "/auth";
-	String PRIVATE_ROUTE_TYPE = "/api";
 	String PUBLIC_ROUTE_TYPE = "/public-api";
+	String ADMIN = "/admin";
+	String USER = "/user";
 	String SAVE = "/save";
 	String UPDATE = "/update";
 	String DELETE = "/delete";

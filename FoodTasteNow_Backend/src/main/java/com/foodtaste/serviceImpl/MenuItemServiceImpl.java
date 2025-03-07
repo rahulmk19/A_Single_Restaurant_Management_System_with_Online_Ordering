@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.foodtaste.exception.MenuItemException;
 import com.foodtaste.model.MenuItem;
-import com.foodtaste.repository.MenuItemRepository;
+import com.foodtaste.repository.MenuItemRepo;
 import com.foodtaste.service.MenuItemService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MenuItemServiceImpl implements MenuItemService {
 
 	@Autowired
-	private MenuItemRepository menuItemRepository;
+	private MenuItemRepo menuItemRepository;
 
 	@Override
 	public MenuItem createItem(MenuItem menuItem) {
@@ -45,10 +45,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 
 	@Override
 	public MenuItem findByName(String name) {
-		
+
 		if (name == null || name.isBlank()) {
-	        throw new MenuItemException("The 'name' parameter must not be empty or null.");
-	    }
+			throw new MenuItemException("The 'name' parameter must not be empty or null.");
+		}
 		log.info("Fetching MenuItem by name (case-insensitive): {}", name);
 
 		return menuItemRepository.findByNameIgnoreCase(name)

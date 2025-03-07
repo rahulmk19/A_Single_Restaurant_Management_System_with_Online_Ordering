@@ -1,12 +1,20 @@
 package com.foodtaste.model;
 
-import com.foodtaste.enums.Role;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -21,8 +29,13 @@ import lombok.NoArgsConstructor;
 public class User {
 
 	@Id
-	private String uuid;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
+	@Column(nullable = false)
+	private String username;
+
+	@Column(nullable = false)
 	private String name;
 
 	@Column(unique = true, nullable = false)
@@ -33,11 +46,16 @@ public class User {
 
 	@NotBlank(message = "Password is required")
 	@Size(min = 8, message = "Password must be at least 8 characters long")
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
 	private String password;
 
-	@Enumerated(EnumType.STRING)
-	private Role role;
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "USER_ROLE", joinColumns = { @JoinColumn(name = "USER_ID") }, inverseJoinColumns = {
+			@JoinColumn(name = "ROLE_ID") })
+	private Set<Role> roles;
+
+	@JsonIgnore
+	@OneToOne(cascade = CascadeType.ALL)
+	private Cart cart;
 
 	private boolean deleted = false;
 }

@@ -9,9 +9,9 @@ import com.foodtaste.model.OrderDetail;
 
 public interface OrderDetailService {
 
-	OrderResponse createOrder(String userId, OrderRequest request);
+	OrderResponse createOrder(OrderRequest request);
 
-	OrderDetail getOrderById(Integer orderId);
+	OrderResponse getOrderById(Integer orderId);
 
 	OrderDetail getOrderByIdWithItems(Integer orderId);
 

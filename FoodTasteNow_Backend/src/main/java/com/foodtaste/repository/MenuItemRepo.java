@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.foodtaste.model.MenuItem;
 
-public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
+public interface MenuItemRepo extends JpaRepository<MenuItem, Integer> {
 
 	@Query("SELECT m FROM MenuItem m WHERE LOWER(m.name) = LOWER(:name)")
 	Optional<MenuItem> findByNameIgnoreCase(String name);

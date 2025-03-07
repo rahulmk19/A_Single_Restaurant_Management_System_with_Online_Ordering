@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.foodtaste.model.MenuItem;
 import com.foodtaste.model.OrderItem;
-import com.foodtaste.repository.OrderItemRepository;
+import com.foodtaste.repository.OrderItemRepo;
 import com.foodtaste.service.MenuItemService;
 import com.foodtaste.service.OrderItemService;
 
@@ -15,7 +15,7 @@ import com.foodtaste.service.OrderItemService;
 public class OrderItemServiceImpl implements OrderItemService {
 
 	@Autowired
-	private OrderItemRepository orderItemRepository;
+	private OrderItemRepo orderItemRepository;
 
 	@Autowired
 	private MenuItemService menuItemService;

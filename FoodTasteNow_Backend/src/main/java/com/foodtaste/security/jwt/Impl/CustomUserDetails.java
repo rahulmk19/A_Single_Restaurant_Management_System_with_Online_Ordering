@@ -1,34 +1,33 @@
-package com.foodtaste.security;
+package com.foodtaste.security.jwt.Impl;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.foodtaste.model.User;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-	private User user;
 
-	public CustomUserDetails(User user) {
-		this.user = user;
-	}
+	private static final long serialVersionUID = 1L;
+	private final String username;
+	private final String password;
+	private final Collection<? extends GrantedAuthority> authorities;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+		return authorities;
 	}
 
 	@Override
 	public String getPassword() {
-		return user.getPassword();
+		return password;
 	}
 
 	@Override
 	public String getUsername() {
-		return user.getEmail();
+		return username;
 	}
 
 	@Override
@@ -50,4 +49,5 @@ public class CustomUserDetails implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
+
 }

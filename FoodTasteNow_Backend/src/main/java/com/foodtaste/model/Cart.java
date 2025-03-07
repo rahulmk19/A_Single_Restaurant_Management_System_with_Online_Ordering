@@ -40,6 +40,4 @@ public class Cart {
 
 	private BigDecimal totalAmount = BigDecimal.ZERO;
 
-	private boolean checkout = false;
-
 }
