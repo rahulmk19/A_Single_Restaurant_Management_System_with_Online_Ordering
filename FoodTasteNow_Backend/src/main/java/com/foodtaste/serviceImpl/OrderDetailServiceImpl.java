@@ -45,7 +45,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	private OrderItemRepo orderItemRepo;
 
 	@Autowired
-	private UserRepo userRepository;
+	private UserRepo userRepo;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -58,7 +58,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		BigDecimal totalOrderAmount = BigDecimal.ZERO;
 		Integer totalOrderQuantity = 0;
 
-		User user = userRepository.findByUsername(JwtFilter.currentUser)
+		User user = userRepo.findByUsername(JwtFilter.currentUser)
 				.orElseThrow(() -> new UserException("User not found with email: " + JwtFilter.currentUser));
 
 		OrderDetail orderDetail = new OrderDetail();
@@ -114,21 +114,26 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	public OrderResponse getOrderById(Integer orderId) {
 		OrderDetail orderDetail = orderDetailRepo.findById(orderId)
 				.orElseThrow(() -> new OrderException("Order not found with id: " + orderId));
+
 		OrderResponse orderResponse = modelMapper.map(orderDetail, OrderResponse.class);
 		return orderResponse;
 	}
 
 	@Override
-	public List<OrderDetail> getAllOrders() {
-		return orderDetailRepo.findAll();
+	public List<OrderResponse> getAllOrders() {
+		List<OrderDetail> allOrders = orderDetailRepo.findAll();
+		List<OrderResponse> orderResponse = allOrders.stream()
+				.map(orderDetail -> modelMapper.map(orderDetail, OrderResponse.class)).toList();
+		return orderResponse;
 	}
 
 	@Override
-	public OrderDetail updateOrderStatus(Integer id, StatusEnum status) {
-		OrderDetail orderDetail = orderDetailRepo.findById(id)
-				.orElseThrow(() -> new OrderException("Order not found with id: " + id));
+	public OrderResponse updateOrderStatus(Integer userId, StatusEnum status) {
+		OrderDetail orderDetail = orderDetailRepo.findById(userId)
+				.orElseThrow(() -> new OrderException("Order not found with id: " + userId));
 		orderDetail.setStatus(status);
-		return orderDetailRepo.save(orderDetail);
+		orderDetail = orderDetailRepo.save(orderDetail);
+		return modelMapper.map(orderDetail, OrderResponse.class);
 	}
 
 	@Override
@@ -139,7 +144,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 	@Override
 	@Transactional
-	public OrderDetail cancelOrderById(Integer orderId) {
+	public OrderResponse cancelOrderById(Integer orderId) {
 		OrderDetail orderDetail = orderDetailRepo.findById(orderId)
 				.orElseThrow(() -> new OrderException("Order not found with id: " + orderId));
 		List<OrderItem> allOrderItem = orderDetail.getItems();
@@ -151,6 +156,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 			menuItemRepo.save(databaseMenuItem);
 		}
 		orderDetail.setStatus(StatusEnum.CANCELED);
-		return orderDetailRepo.save(orderDetail);
+		orderDetail = orderDetailRepo.save(orderDetail);
+		return modelMapper.map(orderDetail, OrderResponse.class);
+	}
+
+	@Override
+	public List<OrderResponse> getOrdersByUser() {
+		Long userId = userRepo.findByUsername(JwtFilter.currentUser).get().getId();
+		List<OrderDetail> allOrders = orderDetailRepo.findOrdersByUserId(userId);
+		List<OrderResponse> getAllOrderResponse = allOrders.stream()
+				.map(order -> modelMapper.map(order, OrderResponse.class)).toList();
+
+		return getAllOrderResponse;
 	}
 }

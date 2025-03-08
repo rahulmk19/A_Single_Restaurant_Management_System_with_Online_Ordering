@@ -37,6 +37,13 @@ public class OrderController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+	@GetMapping(AppConstants.USER + "/getalluserorders")
+	public ResponseEntity<List<OrderResponse>> getOrdersByUser() {
+		List<OrderResponse> allOrderByUser = orderDetailService.getOrdersByUser();
+		return ResponseEntity.ok(allOrderByUser);
+
+	}
+
 	@GetMapping(AppConstants.ADMIN + AppConstants.GET_BY_ID + "/{id}")
 	public ResponseEntity<OrderResponse> getOrderDetailsById(@PathVariable Integer id) {
 		log.info("Received request to fetch order details with ID: {}", id);
@@ -51,24 +58,24 @@ public class OrderController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(AppConstants.GET_ALL)
-	public ResponseEntity<List<OrderDetail>> getAllOrders() {
+	@GetMapping(AppConstants.ADMIN + AppConstants.GET_ALL)
+	public ResponseEntity<List<OrderResponse>> getAllOrders() {
 		log.info("Received request to fetch all orders");
-		List<OrderDetail> response = orderDetailService.getAllOrders();
+		List<OrderResponse> response = orderDetailService.getAllOrders();
 		return ResponseEntity.ok(response);
 	}
 
-	@PatchMapping(AppConstants.UPDATE + "/{id}/status")
-	public ResponseEntity<OrderDetail> updateOrderStatus(@PathVariable Integer id, @RequestBody StatusEnum status) {
+	@PatchMapping(AppConstants.ADMIN + AppConstants.UPDATE + "/{id}/{status}")
+	public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Integer id, @RequestBody StatusEnum status) {
 		log.info("Received request to update status of order with ID: {}", id);
-		OrderDetail updatedOrder = orderDetailService.updateOrderStatus(id, status);
+		OrderResponse updatedOrder = orderDetailService.updateOrderStatus(id, status);
 		return ResponseEntity.ok(updatedOrder);
 	}
 
-	@PatchMapping("/cancel/{id}")
-	public ResponseEntity<OrderDetail> cancelOrderStatus(@PathVariable Integer id) {
+	@PatchMapping(AppConstants.COMMON + "/cancel/{id}")
+	public ResponseEntity<OrderResponse> cancelOrderStatus(@PathVariable Integer id) {
 		log.info("Received request to cancel order with ID: {}", id);
-		OrderDetail updatedOrder = orderDetailService.cancelOrderById(id);
+		OrderResponse updatedOrder = orderDetailService.cancelOrderById(id);
 		return ResponseEntity.ok(updatedOrder);
 	}
 }

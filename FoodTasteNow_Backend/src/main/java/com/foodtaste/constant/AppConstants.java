@@ -7,6 +7,7 @@ public interface AppConstants {
 	String PUBLIC_ROUTE_TYPE = "/public-api";
 	String ADMIN = "/admin";
 	String USER = "/user";
+	String COMMON = "/common";
 	String SAVE = "/save";
 	String UPDATE = "/update";
 	String DELETE = "/delete";

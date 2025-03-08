@@ -15,10 +15,12 @@ public interface OrderDetailService {
 
 	OrderDetail getOrderByIdWithItems(Integer orderId);
 
-	List<OrderDetail> getAllOrders();
+	List<OrderResponse> getAllOrders();
 
-	OrderDetail updateOrderStatus(Integer orderId, StatusEnum status);
+	OrderResponse updateOrderStatus(Integer orderId, StatusEnum status);
 
-	OrderDetail cancelOrderById(Integer orderId);
+	OrderResponse cancelOrderById(Integer orderId);
+
+	List<OrderResponse> getOrdersByUser();
 
 }
