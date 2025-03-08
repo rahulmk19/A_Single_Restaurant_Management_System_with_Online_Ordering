@@ -8,6 +8,8 @@ public class SecurityConstants {
 	// 🔹 User Endpoints
 	public static final String userDetails = AppConstants.APP_NAME + AppConstants.USER + "/**";
 
+	public static final String cart = AppConstants.APP_NAME + "/cart" + AppConstants.USER + "/**";
+
 	// 🔹 Public Endpoints (Available to everyone)
 	public static final String public_Auth = AppConstants.APP_NAME + AppConstants.PUBLIC_ROUTE_TYPE + "/**";
 	public static final String public_Item = AppConstants.APP_NAME + "/items" + AppConstants.PUBLIC_ROUTE_TYPE + "/**";

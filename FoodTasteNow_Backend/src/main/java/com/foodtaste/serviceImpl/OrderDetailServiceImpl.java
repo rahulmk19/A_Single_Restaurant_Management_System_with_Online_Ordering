@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +17,17 @@ import com.foodtaste.dto.OrderItemResponse;
 import com.foodtaste.dto.OrderRequest;
 import com.foodtaste.dto.OrderResponse;
 import com.foodtaste.enums.StatusEnum;
+import com.foodtaste.exception.CartException;
 import com.foodtaste.exception.MenuItemException;
 import com.foodtaste.exception.OrderException;
 import com.foodtaste.exception.UserException;
+import com.foodtaste.model.Cart;
+import com.foodtaste.model.CartItem;
 import com.foodtaste.model.MenuItem;
 import com.foodtaste.model.OrderDetail;
 import com.foodtaste.model.OrderItem;
 import com.foodtaste.model.User;
+import com.foodtaste.repository.CartRepo;
 import com.foodtaste.repository.MenuItemRepo;
 import com.foodtaste.repository.OrderDetailRepo;
 import com.foodtaste.repository.OrderItemRepo;
@@ -48,18 +54,29 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	private UserRepo userRepo;
 
 	@Autowired
+	private CartRepo cartRepo;
+
+	@Autowired
 	private ModelMapper modelMapper;
+
+	private User getCurrentUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || !auth.isAuthenticated()) {
+			throw new UserException("User is not authenticated");
+		}
+		String username = auth.getName();
+		return userRepo.findByUsername(username)
+				.orElseThrow(() -> new UserException("User not found with username: " + username));
+	}
 
 	@Transactional
 	@Override
 	public OrderResponse createOrder(OrderRequest orderRequest) {
 
+		User user = getCurrentUser();
 		List<OrderItem> orderItems = new ArrayList<>();
 		BigDecimal totalOrderAmount = BigDecimal.ZERO;
 		Integer totalOrderQuantity = 0;
-
-		User user = userRepo.findByUsername(JwtFilter.currentUser)
-				.orElseThrow(() -> new UserException("User not found with email: " + JwtFilter.currentUser));
 
 		OrderDetail orderDetail = new OrderDetail();
 		orderDetail.setCustomerName(orderRequest.getCustomerName());
@@ -104,10 +121,49 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		List<OrderItemResponse> orderItemResponse = orderItems.stream().map(
 				item -> new OrderItemResponse(item.getMenuItem().getName(), item.getQuantity(), item.getSubTotal()))
 				.toList();
+
 		return new OrderResponse(orderDetail.getId(), user.getId(), totalOrderAmount, totalOrderQuantity,
 				orderDetail.getCreatedAtTime(), orderDetail.getCustomerName(), orderDetail.getCustomerAddress(),
 				orderDetail.getContactNum(), orderDetail.getAlternateContactNum(), orderDetail.getStatus(),
 				orderItemResponse);
+	}
+
+	@Transactional
+	@Override
+	public OrderResponse checkout() {
+		User user = getCurrentUser();
+		Cart cart = cartRepo.findByUser(user)
+				.orElseThrow(() -> new CartException("Cart not found for user: " + user.getUsername()));
+
+		if (cart.getCartItem().isEmpty()) {
+			throw new CartException("Cannot checkout an empty cart");
+		}
+
+		OrderDetail order = new OrderDetail();
+		order.setUser(user);
+		order.setTotalOrderAmount(cart.getTotalAmount());
+		order.setTotalOrderQuantity(cart.getTotalQty());
+		order.setStatus(StatusEnum.PENDING);
+		order.setCreatedAtTime(LocalDateTime.now());
+
+		List<OrderItem> orderItems = new ArrayList<>();
+		for (CartItem cartItem : cart.getCartItem()) {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setMenuItem(cartItem.getMenuItem());
+			orderItem.setQuantity(cartItem.getQuantity());
+			orderItem.setSubTotal(cartItem.getSubTotal());
+			orderItem.setOrderDetail(order);
+			orderItems.add(orderItem);
+		}
+		order.setItems(orderItems);
+
+		OrderDetail savedOrder = orderDetailRepo.save(order);
+
+		cart.getCartItem().clear();
+		cartRepo.save(cart);
+
+		OrderResponse orderPlaced = modelMapper.map(savedOrder, OrderResponse.class);
+		return orderPlaced;
 	}
 
 	@Override
@@ -162,7 +218,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 	@Override
 	public List<OrderResponse> getOrdersByUser() {
-		Long userId = userRepo.findByUsername(JwtFilter.currentUser).get().getId();
+		User user = getCurrentUser();
+		Long userId = userRepo.findByUsername(user.getUsername()).get().getId();
 		List<OrderDetail> allOrders = orderDetailRepo.findOrdersByUserId(userId);
 		List<OrderResponse> getAllOrderResponse = allOrders.stream()
 				.map(order -> modelMapper.map(order, OrderResponse.class)).toList();

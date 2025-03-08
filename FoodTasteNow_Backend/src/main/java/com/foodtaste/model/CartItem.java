@@ -25,12 +25,12 @@ public class CartItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "cart_id", nullable = false)
 	private Cart cart;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "menu_item_id", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "menuItem_id", nullable = false)
 	private MenuItem menuItem;
 
 	private Integer quantity;

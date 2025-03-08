@@ -15,6 +15,8 @@ public interface OrderDetailService {
 
 	OrderDetail getOrderByIdWithItems(Integer orderId);
 
+	OrderResponse checkout();
+
 	List<OrderResponse> getAllOrders();
 
 	OrderResponse updateOrderStatus(Integer orderId, StatusEnum status);

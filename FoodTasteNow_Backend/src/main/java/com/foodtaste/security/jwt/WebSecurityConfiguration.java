@@ -38,7 +38,7 @@ public class WebSecurityConfiguration {
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.disable()).authorizeHttpRequests(
 				authorize -> authorize
 				.requestMatchers(SecurityConstants.menuItem,"foodtastenow/orders/admin/**","foodtastenow/orders/common/**").hasRole("Admin")
-					.requestMatchers(SecurityConstants.userDetails,"foodtastenow/orders/**","foodtastenow/orders/common/**").hasRole("User")
+					.requestMatchers(SecurityConstants.userDetails,"foodtastenow/orders/**","foodtastenow/orders/common/**",SecurityConstants.cart).hasRole("User")
 						.requestMatchers(SecurityConstants.public_Auth, SecurityConstants.public_Item).permitAll())
 
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

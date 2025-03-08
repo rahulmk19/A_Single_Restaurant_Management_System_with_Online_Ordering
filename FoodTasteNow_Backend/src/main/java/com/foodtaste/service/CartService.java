@@ -1,20 +1,18 @@
 package com.foodtaste.service;
 
+import com.foodtaste.dto.CartResponse;
 import com.foodtaste.model.Cart;
 import com.foodtaste.model.MenuItem;
+import com.foodtaste.model.User;
 
 public interface CartService {
 
-	Cart addItemToCart(String userId, Integer menuItemId);
-	
-	void removeItemFromCart(String userId, Integer cartItemId);
-	
-	Cart checkoutCart(String userId);
+	CartResponse getCart();
 
-	Cart updateCartItemQuantity(String userId, Integer menuItemId, int newQuantity);
+	Cart addItemToCart(Integer menuItemId);
 
-	Cart clearCart(String userId);
-	
-	Cart getActiveCart(String userId);
+	Cart removeItemFromCart(Integer menuItemId);
+
+	Cart updateCartItemQuantity(Integer menuItemId, int newQuantity);
 
 }
