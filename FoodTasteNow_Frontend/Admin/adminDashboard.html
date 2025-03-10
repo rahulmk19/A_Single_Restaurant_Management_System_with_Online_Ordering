@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+    }
+    .fixed-screen {
+      height: 100vh;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 fixed-screen">
+  <!-- Navbar -->
+  <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <h2 class="text-3xl font-bold">Admin Dashboard</h2>
+    <div>
+      <span class="mr-4 text-lg">Welcome, Admin</span>
+      <button class="bg-red-500 px-4 py-2 rounded text-lg">Logout</button>
+    </div>
+  </div>
+
+  <div class="flex h-full">
+    <!-- Sidebar -->
+    <div class="w-64 bg-blue-600 text-white h-full p-5">
+      <ul>
+        <li class="mb-6 text-lg"><a href="#" onclick="showSection('orders')">📜 Orders</a></li>
+        <li class="mb-6 text-lg"><a href="#" onclick="showSection('products')">📦 Products</a></li>
+        <li class="mb-6 text-lg"><a href="#" onclick="showSection('users')">👥 Users</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-5 overflow-auto">
+      <div id="orders" class="content-section hidden">
+        <h2 class="text-xl font-bold">Orders Section</h2>
+        <p>Here you can manage orders.</p>
+      </div>
+
+      <div id="products" class="content-section hidden">
+        <h2 class="text-xl font-bold">Products Section</h2>
+        <p>Here you can manage products.</p>
+      </div>
+
+      <div id="users" class="content-section hidden">
+        <h2 class="text-xl font-bold">Users Section</h2>
+        <p>Here you can manage users.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function showSection(section) {
+    document.querySelectorAll('.content-section').forEach(div => {
+      div.classList.add('hidden');
+    });
+
+    document.getElementById(section).classList.remove('hidden');
+  }
+
+  // Show Orders section by default
+  showSection('orders');
+</script>
+</body>
+</html>
