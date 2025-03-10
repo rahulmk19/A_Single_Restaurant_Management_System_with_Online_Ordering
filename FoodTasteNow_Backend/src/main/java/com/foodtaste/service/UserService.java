@@ -1,11 +1,9 @@
 package com.foodtaste.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.foodtaste.dto.UserRequestDTO;
 import com.foodtaste.dto.UserResponseDTO;
-import com.foodtaste.model.User;
 
 public interface UserService {
 

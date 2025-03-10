@@ -2,8 +2,9 @@ package com.foodtaste.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +28,7 @@ public class CartItem {
 
 	@ManyToOne
 	@JoinColumn(name = "cart_id", nullable = false)
+	@JsonIgnore
 	private Cart cart;
 
 	@ManyToOne

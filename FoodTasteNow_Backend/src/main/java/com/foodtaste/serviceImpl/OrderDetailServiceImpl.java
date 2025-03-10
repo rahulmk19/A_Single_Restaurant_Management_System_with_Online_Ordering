@@ -32,7 +32,6 @@ import com.foodtaste.repository.MenuItemRepo;
 import com.foodtaste.repository.OrderDetailRepo;
 import com.foodtaste.repository.OrderItemRepo;
 import com.foodtaste.repository.UserRepo;
-import com.foodtaste.security.jwt.JwtFilter;
 import com.foodtaste.service.OrderDetailService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -161,9 +160,14 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 		cart.getCartItem().clear();
 		cartRepo.save(cart);
+		List<OrderItemResponse> orderItemResponse = orderItems.stream().map(
+				item -> new OrderItemResponse(item.getMenuItem().getName(), item.getQuantity(), item.getSubTotal()))
+				.toList();
 
-		OrderResponse orderPlaced = modelMapper.map(savedOrder, OrderResponse.class);
-		return orderPlaced;
+		return new OrderResponse(savedOrder.getId(), user.getId(), savedOrder.getTotalOrderAmount(),
+				savedOrder.getTotalOrderQuantity(), savedOrder.getCreatedAtTime(), savedOrder.getCustomerName(),
+				savedOrder.getCustomerAddress(), savedOrder.getContactNum(), savedOrder.getAlternateContactNum(),
+				savedOrder.getStatus(), orderItemResponse);
 	}
 
 	@Override

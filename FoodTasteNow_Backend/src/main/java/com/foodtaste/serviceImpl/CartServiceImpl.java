@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.foodtaste.dto.CartResponse;
+import com.foodtaste.dto.OrderResponse;
 import com.foodtaste.exception.MenuItemException;
 import com.foodtaste.exception.UserException;
 import com.foodtaste.model.Cart;
@@ -24,6 +25,7 @@ import com.foodtaste.repository.CartRepo;
 import com.foodtaste.repository.MenuItemRepo;
 import com.foodtaste.repository.UserRepo;
 import com.foodtaste.service.CartService;
+import com.foodtaste.service.OrderDetailService;
 
 @Service
 @Transactional
@@ -45,6 +47,9 @@ public class CartServiceImpl implements CartService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+
+	@Autowired
+	private OrderDetailService orderDetailService;
 
 	private User getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -76,8 +81,9 @@ public class CartServiceImpl implements CartService {
 		});
 	}
 
+	@Transactional
 	@Override
-	public Cart addItemToCart(Integer menuItemId) {
+	public CartResponse addItemToCart(Integer menuItemId) {
 		User user = getCurrentUser();
 		Cart cart = getOrCreateCart(user);
 
@@ -103,7 +109,9 @@ public class CartServiceImpl implements CartService {
 			newItem.setMenuItem(menuItem);
 			newItem.setQuantity(1);
 			newItem.setSubTotal(menuItem.getPrice());
+			newItem.setCart(cart);
 			cart.getCartItem().add(newItem);
+			cartItemRepo.save(newItem);
 			log.info("Added new MenuItem {} to cart", menuItem.getName());
 		}
 
@@ -112,11 +120,14 @@ public class CartServiceImpl implements CartService {
 		log.info("Updated stock for MenuItem {}. New stock: {}", menuItem.getName(), menuItem.getQuantity());
 
 		recalculateCart(cart);
-		return cartRepo.save(cart);
+		Cart savedCart = cartRepo.save(cart);
+		CartResponse cartResponse = modelMapper.map(savedCart, CartResponse.class);
+		return cartResponse;
 	}
 
+	@Transactional
 	@Override
-	public Cart removeItemFromCart(Integer menuItemId) {
+	public CartResponse removeItemFromCart(Integer menuItemId) {
 		User user = getCurrentUser();
 		Cart cart = cartRepo.findByUser(user)
 				.orElseThrow(() -> new UserException("Cart not found for user: " + user.getUsername()));
@@ -137,11 +148,14 @@ public class CartServiceImpl implements CartService {
 			throw new MenuItemException("Item not found in the cart with id: " + menuItemId);
 		}
 		recalculateCart(cart);
-		return cartRepo.save(cart);
+		Cart savedCart = cartRepo.save(cart);
+		CartResponse cartResponse = modelMapper.map(savedCart, CartResponse.class);
+		return cartResponse;
 	}
 
+	@Transactional
 	@Override
-	public Cart updateCartItemQuantity(Integer menuItemId, int newQuantity) {
+	public CartResponse updateCartItemQuantity(Integer menuItemId, int newQuantity) {
 		User user = getCurrentUser();
 		Cart cart = getOrCreateCart(user);
 
@@ -181,7 +195,13 @@ public class CartServiceImpl implements CartService {
 			throw new MenuItemException("Cart item not found with menuItem id: " + menuItemId);
 		}
 		recalculateCart(cart);
-		return cartRepo.save(cart);
+		Cart savedCart = cartRepo.save(cart);
+		CartResponse cartResponse = modelMapper.map(savedCart, CartResponse.class);
+		return cartResponse;
+	}
+
+	public OrderResponse placedOrder() {
+		return orderDetailService.checkout();
 	}
 
 	private void recalculateCart(Cart cart) {
