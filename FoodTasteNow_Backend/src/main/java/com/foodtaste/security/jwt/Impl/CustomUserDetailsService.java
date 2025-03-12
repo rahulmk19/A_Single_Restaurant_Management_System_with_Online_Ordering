@@ -32,14 +32,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 			user = userRepo.findByUsername(loginAttribute).orElseThrow(
 					() -> new UsernameNotFoundException("User not found with username: " + loginAttribute));
 		}
-//		else if (loginAttribute.matches("\\d{10}")) {
-//			user = userRepo.findByMobileNo(loginAttribute).orElseThrow(
-//					() -> new UsernameNotFoundException("User not found with mobile number: " + loginAttribute));
-//		} 
-//		else if (loginAttribute.contains("@")) {
-//			user = userRepo.findByEmail(loginAttribute)
-//					.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginAttribute));
-//		}
+		else if (loginAttribute.matches("\\d{10}")) {
+			user = userRepo.findByMobileNumber(loginAttribute).orElseThrow(
+					() -> new UsernameNotFoundException("User not found with mobile number: " + loginAttribute));
+		} 
+		else if (loginAttribute.contains("@")) {
+			user = userRepo.findByEmail(loginAttribute)
+					.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginAttribute));
+		}
 		else {
 			throw new UsernameNotFoundException("Invalid username format");
 		}

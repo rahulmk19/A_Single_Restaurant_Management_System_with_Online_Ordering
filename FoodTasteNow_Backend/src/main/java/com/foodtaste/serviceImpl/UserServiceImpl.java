@@ -70,6 +70,7 @@ public class UserServiceImpl implements UserService {
 	public UserResponseDTO createNewUser(UserRequestDTO userRequestDTO) {
 		log.info("Creating user with email: {} and mobile: {}", userRequestDTO.getEmail(),
 				userRequestDTO.getMobileNumber());
+
 		Optional<User> isEmailExits = userRepo.findByEmail(userRequestDTO.getEmail());
 		if (isEmailExits.isPresent()) {
 			log.warn("Email already exists: {}", userRequestDTO.getEmail());
@@ -93,6 +94,7 @@ public class UserServiceImpl implements UserService {
 		newUser.setEmail(userRequestDTO.getEmail());
 		newUser.setMobileNumber(userRequestDTO.getMobileNumber());
 		newUser.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+
 		Set<Role> userRole = new HashSet<>();
 		Role role = roleRepo.findByRoleName("User").orElseGet(() -> {
 			Role newRole = new Role();
@@ -102,6 +104,7 @@ public class UserServiceImpl implements UserService {
 		});
 		userRole.add(role);
 		newUser.setRoles(userRole);
+
 		User savedUser = userRepo.save(newUser);
 		return modelMapper.map(savedUser, UserResponseDTO.class);
 	}

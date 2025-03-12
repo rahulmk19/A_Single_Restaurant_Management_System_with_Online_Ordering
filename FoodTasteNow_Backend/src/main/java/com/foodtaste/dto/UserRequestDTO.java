@@ -1,6 +1,5 @@
 package com.foodtaste.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -14,12 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRequestDTO {
 
-	@NotBlank
+	@NotBlank(message = "Username must not be blank")
 	@Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9]*$", message = "Username should start with an alphabet and contain only alphanumeric characters")
-	@Column(nullable = false)
 	private String username;
 
-	@NotBlank
+	@NotBlank(message = "Name must not be blank")
 	@Size(min = 3, message = "Name should be greater than 3 characters")
 	private String name;
 
@@ -34,5 +32,4 @@ public class UserRequestDTO {
 	@Size(min = 8, message = "Password must be at least 8 characters long")
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
 	private String password;
-
 }

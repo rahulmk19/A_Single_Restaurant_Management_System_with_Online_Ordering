@@ -1,6 +1,7 @@
 package com.foodtaste.service;
 
 import com.foodtaste.dto.CartResponse;
+import com.foodtaste.dto.CheckoutOrderRequest;
 import com.foodtaste.dto.OrderResponse;
 
 public interface CartService {
@@ -12,7 +13,7 @@ public interface CartService {
 	CartResponse removeItemFromCart(Integer menuItemId);
 
 	CartResponse updateCartItemQuantity(Integer menuItemId, int newQuantity);
-	
-	OrderResponse placedOrder();
+
+	OrderResponse placedOrder(CheckoutOrderRequest orderRequest);
 
 }

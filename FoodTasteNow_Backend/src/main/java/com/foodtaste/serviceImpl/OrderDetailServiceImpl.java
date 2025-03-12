@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.foodtaste.dto.CheckoutOrderRequest;
 import com.foodtaste.dto.OrderItemRequest;
 import com.foodtaste.dto.OrderItemResponse;
 import com.foodtaste.dto.OrderRequest;
@@ -129,13 +130,14 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 	@Transactional
 	@Override
-	public OrderResponse checkout() {
+	public OrderResponse checkout(CheckoutOrderRequest orderRequest) {
 		User user = getCurrentUser();
 		Cart cart = cartRepo.findByUser(user)
 				.orElseThrow(() -> new CartException("Cart not found for user: " + user.getUsername()));
 
 		if (cart.getCartItem().isEmpty()) {
 			throw new CartException("Cannot checkout an empty cart");
+			
 		}
 
 		OrderDetail order = new OrderDetail();
@@ -144,6 +146,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		order.setTotalOrderQuantity(cart.getTotalQty());
 		order.setStatus(StatusEnum.PENDING);
 		order.setCreatedAtTime(LocalDateTime.now());
+		order.setCustomerName(orderRequest.getCustomerName());
+		order.setContactNum(orderRequest.getContactNum());
+		order.setAlternateContactNum(orderRequest.getAlternateContactNum());
+		order.setCustomerAddress(orderRequest.getCustomerAddress());
+
 
 		List<OrderItem> orderItems = new ArrayList<>();
 		for (CartItem cartItem : cart.getCartItem()) {
@@ -159,6 +166,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		OrderDetail savedOrder = orderDetailRepo.save(order);
 
 		cart.getCartItem().clear();
+		cart.setTotalQty(0);
+		cart.setTotalAmount(BigDecimal.ZERO);
 		cartRepo.save(cart);
 		List<OrderItemResponse> orderItemResponse = orderItems.stream().map(
 				item -> new OrderItemResponse(item.getMenuItem().getName(), item.getQuantity(), item.getSubTotal()))

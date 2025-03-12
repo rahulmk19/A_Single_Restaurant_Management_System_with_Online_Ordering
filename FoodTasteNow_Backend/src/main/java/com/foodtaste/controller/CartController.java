@@ -3,21 +3,28 @@ package com.foodtaste.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.foodtaste.constant.AppConstants;
 import com.foodtaste.dto.CartResponse;
+import com.foodtaste.dto.CheckoutOrderRequest;
+import com.foodtaste.dto.OrderRequest;
 import com.foodtaste.dto.OrderResponse;
 import com.foodtaste.service.CartService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(AppConstants.APP_NAME + "/cart" + AppConstants.USER)
+@CrossOrigin(origins = "*")
 public class CartController {
 
 	@Autowired
@@ -49,8 +56,8 @@ public class CartController {
 	}
 
 	@PostMapping("/placedorder")
-	public ResponseEntity<OrderResponse> placedOrder() {
-		OrderResponse orderPlaced = cartService.placedOrder();
+	public ResponseEntity<OrderResponse> placedOrder(@Valid @RequestBody CheckoutOrderRequest orderRequest) {
+		OrderResponse orderPlaced = cartService.placedOrder(orderRequest);
 		return new ResponseEntity<>(orderPlaced, HttpStatus.OK);
 	}
 }

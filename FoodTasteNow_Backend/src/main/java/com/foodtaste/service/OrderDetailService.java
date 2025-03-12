@@ -2,6 +2,7 @@ package com.foodtaste.service;
 
 import java.util.List;
 
+import com.foodtaste.dto.CheckoutOrderRequest;
 import com.foodtaste.dto.OrderRequest;
 import com.foodtaste.dto.OrderResponse;
 import com.foodtaste.enums.StatusEnum;
@@ -15,7 +16,7 @@ public interface OrderDetailService {
 
 	OrderDetail getOrderByIdWithItems(Integer orderId);
 
-	OrderResponse checkout();
+	OrderResponse checkout(CheckoutOrderRequest orderRequest);
 
 	List<OrderResponse> getAllOrders();
 

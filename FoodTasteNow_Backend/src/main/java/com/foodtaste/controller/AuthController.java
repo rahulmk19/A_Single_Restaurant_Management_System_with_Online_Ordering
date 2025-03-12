@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +19,11 @@ import com.foodtaste.dto.UserRequestDTO;
 import com.foodtaste.service.AuthService;
 import com.foodtaste.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(AppConstants.APP_NAME + AppConstants.PUBLIC_ROUTE_TYPE + AppConstants.Auth)
+@CrossOrigin(origins = "*")
 public class AuthController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -31,7 +35,7 @@ public class AuthController {
 	private AuthService authService;
 
 	@PostMapping("/register")
-	public ResponseEntity<String> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
+	public ResponseEntity<String> registerUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
 		if (userRequestDTO == null || !userRequestDTO.getUsername().matches("^[a-zA-Z][a-zA-Z0-9]*$")) {
 			throw new RuntimeException("Username should have only alphabets or alphabets with number.");
 		}

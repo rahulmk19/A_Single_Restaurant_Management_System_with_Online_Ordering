@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.foodtaste.dto.CartResponse;
+import com.foodtaste.dto.CheckoutOrderRequest;
+import com.foodtaste.dto.OrderRequest;
 import com.foodtaste.dto.OrderResponse;
 import com.foodtaste.exception.MenuItemException;
 import com.foodtaste.exception.UserException;
@@ -200,8 +202,8 @@ public class CartServiceImpl implements CartService {
 		return cartResponse;
 	}
 
-	public OrderResponse placedOrder() {
-		return orderDetailService.checkout();
+	public OrderResponse placedOrder(CheckoutOrderRequest orderRequest) {
+		return orderDetailService.checkout(orderRequest);
 	}
 
 	private void recalculateCart(Cart cart) {
