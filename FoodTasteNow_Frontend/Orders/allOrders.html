@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FoodTasteNow - My Orders</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHqT7LKy2tT1Y4B6L5/6x3Z4I3V9B+4uX1Rm2B0s1KjF9xzp2KVVjvbHAfO9wDVWD1Z5gXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Dropdown styling */
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        z-index: 50;
+      }
+      .dropdown-menu a {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #333;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+      .dropdown-menu a:hover {
+        background-color: #f1f1f1;
+      }
+      .open .dropdown-menu {
+        display: block;
+      }
+      /* Make room for fixed header */
+      body {
+        padding-top: 80px;
+      }
+      /* Custom box-shadow for orders */
+      .custom-shadow {
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px,
+          rgb(51, 51, 51) 0px 0px 0px 3px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Fixed Navbar -->
+    <nav class="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg z-50">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-6">
+          <div class="logo">
+            <a href="../index.html" class="text-white font-extrabold text-3xl tracking-wide">FoodTasteNow</a>
+          </div>
+          <!-- Main navigation links -->
+          <div class="nav-links hidden md:flex space-x-4" id="navLinks">
+            <a href="../index.html" class="text-white hover:text-gray-200">Home</a>
+            <a href="../category.html" class="text-white hover:text-gray-200">Category</a>
+          </div>
+        </div>
+        <!-- Authentication Section -->
+        <div class="flex items-center space-x-4">
+          <div class="auth" id="authSection">
+            <!-- Will be updated by updateNavbar() -->
+            <a href="../User/login.html" class="text-white">Sign In</a>
+          </div>
+          <!-- Mobile Hamburger -->
+          <button class="md:hidden text-white focus:outline-none" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu hidden md:hidden bg-red-500 text-white p-4 fixed top-16 w-full z-40" id="mobileMenu">
+      <a href="../index.html" class="block py-2">Home</a>
+      <a href="../category.html" class="block py-2">Category</a>
+      <a href="../User/login.html" class="block py-2">Sign In</a>
+    </div>
+
+    <!-- Orders Page Content -->
+    <div class="max-w-6xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+      <!-- Sticky My Orders Header -->
+      <div class="sticky top-20 bg-white z-30 py-4">
+        <h2 class="text-center text-2xl font-bold text-gray-800">My Orders</h2>
+      </div>
+      <div id="ordersSection">
+        <p class="text-center text-gray-600">Loading orders...</p>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      // Authentication functions
+      function getNameFromToken() {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) return null;
+        try {
+          const payloadBase64 = token.split(".")[1];
+          const payload = JSON.parse(atob(payloadBase64));
+          return payload.name || payload.sub || null;
+        } catch (error) {
+          console.error("Error decoding token:", error);
+          return null;
+        }
+      }
+
+      function updateNavbar() {
+        const authDiv = document.getElementById("authSection");
+        const name = getNameFromToken();
+        if (name) {
+          authDiv.innerHTML = `
+            <div class="flex items-center space-x-4">
+              <div class="relative inline-block" id="userDropdownContainer">
+                <button id="userDropdownButton" class="text-white focus:outline-none inline-flex items-center">
+                  <span>${name}</span>
+                  <i class="fas fa-caret-down ml-1"></i>
+                </button>
+                <div id="userDropdown" class="dropdown-menu">
+                  <a href="profile.html">My Profile</a>
+                  <a href="coupons.html">Coupon</a>
+                  <a href="notifications.html">Notifications</a>
+                  <a href="#" id="logout">Logout</a>
+                </div>
+              </div>
+              <a id="cartButton" href="../Cart/cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
+                <i class="fas fa-shopping-cart text-2xl"></i>
+                <span class="text-lg font-normal">Cart</span>
+              </a>
+            </div>
+          `;
+          const dropdownContainer = document.getElementById("userDropdownContainer");
+          dropdownContainer.addEventListener("mouseenter", () => {
+            dropdownContainer.classList.add("open");
+          });
+          dropdownContainer.addEventListener("mouseleave", () => {
+            dropdownContainer.classList.remove("open");
+          });
+          document.getElementById("logout").addEventListener("click", (e) => {
+            e.preventDefault();
+            logout();
+          });
+        } else {
+          authDiv.innerHTML = `<a href="../User/login.html" class="text-white">Sign In</a>`;
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("jwtToken");
+        window.location.href = "../index.html";
+      }
+
+      // Mobile menu toggle
+      function toggleMobileMenu() {
+        const mobileMenu = document.getElementById("mobileMenu");
+        mobileMenu.classList.toggle("hidden");
+      }
+
+      // Orders fetching functions
+      async function loadOrders() {
+        const ordersSection = document.getElementById("ordersSection");
+        ordersSection.innerHTML = '<p class="text-center text-gray-600">Loading orders...</p>';
+        try {
+          const token = localStorage.getItem("jwtToken");
+          if (!token) {
+            throw new Error("User is not authenticated. Please sign in.");
+          }
+          console.log("JWT Token found:", token);
+          console.log("Starting fetch for orders...");
+
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/orders/user/getalluserorders",
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const orders = await response.json();
+          console.log("Fetched orders:", orders);
+          displayOrders(orders);
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          ordersSection.innerHTML = `<p class="text-center text-red-600">${error.message}</p>`;
+        }
+      }
+
+      function displayOrders(orders) {
+        orders.sort((a, b) => b.orderId - a.orderId);
+        const ordersSection = document.getElementById("ordersSection");
+        if (!orders || orders.length === 0) {
+          ordersSection.innerHTML = `
+            <div class="text-center p-6">
+              <h3 class="text-xl font-semibold text-gray-800">No Orders Found</h3>
+              <p class="text-gray-600 mt-2">
+                It looks like you haven't placed any orders yet. Once you start ordering,
+                you'll see them here. Please visit our 
+                <a href="../index.html" class="text-blue-500 underline">Home</a>
+                page to explore our offerings.
+              </p>
+            </div>
+          `;
+          return;
+        }
+        let html = "";
+        orders.forEach((order) => {
+          const totalAmount = parseFloat(order.totalAmount).toFixed(2);
+          // Show cancel button only if order status is neither DELIVERED nor CANCELED
+          let actionButtons = "";
+          if (order.status !== "DELIVERED" && order.status !== "CANCELED") {
+            actionButtons = `
+              <button id="cancel-btn-${order.orderId}" onclick="cancelOrder(${order.orderId})" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                Cancel
+              </button>
+              <button onclick="helpOrder(${order.orderId})" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                Help
+              </button>
+            `;
+          } else {
+            actionButtons = `
+              <button onclick="helpOrder(${order.orderId})" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                Help
+              </button>
+            `;
+          }
+
+          html += `
+            <div class="bg-white rounded-lg custom-shadow p-6 mb-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-4">Order ID: ${order.orderId}</h2>
+              
+              <!-- Flex container for Order & Customer Details -->
+              <div class="flex flex-col md:flex-row md:space-x-6">
+                <!-- Order Details Section -->
+                <div class="flex-1 border p-4 mb-4 md:mb-0">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2">Order Details</h3>
+                  <p class="text-gray-700"><span class="font-semibold">Date:</span> ${order.createdAt}</p>
+                  <p class="text-gray-700"><span class="font-semibold">Status:</span> ${order.status}</p>
+                  <p class="text-gray-700"><span class="font-semibold">Total Quantity:</span> ${order.totalQuantity}</p>
+                  <p class="text-gray-700"><span class="font-semibold">Total Amount:</span> ₹${totalAmount}</p>
+                </div>
+                <!-- Customer Details Section -->
+                <div class="flex-1 border p-4">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2">Customer Details</h3>
+                  <p class="text-gray-700"><span class="font-semibold">Customer Name:</span> ${order.customerName || 'Not Provided'}</p>
+                  <p class="text-gray-700"><span class="font-semibold">Customer Address:</span> ${order.customerAddress || 'Not Provided'}</p>
+                  <p class="text-gray-700"><span class="font-semibold">Contact Number:</span> ${order.contactNum || 'Not Provided'}</p>
+                  <p class="text-gray-700"><span class="font-semibold">Alternate Contact Number:</span> ${order.alternateContactNum || 'Not Provided'}</p>
+                </div>
+              </div>
+              
+              <!-- Items Section -->
+              <div class="mt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Items</h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full bg-white">
+                    <thead>
+                      <tr>
+                        <th class="py-2 px-4 border-b text-left">Item Name</th>
+                        <th class="py-2 px-4 border-b text-left">Quantity</th>
+                        <th class="py-2 px-4 border-b text-left">Sub Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${order.items
+                        .map((item) => {
+                          const subTotal = parseFloat(item.subTotal).toFixed(2);
+                          return `
+                          <tr>
+                            <td class="py-2 px-4 border-b">${item.menuItemName}</td>
+                            <td class="py-2 px-4 border-b">${item.quantity}</td>
+                            <td class="py-2 px-4 border-b">₹${subTotal}</td>
+                          </tr>
+                          `;
+                        })
+                        .join("")}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- Action Buttons Section -->
+              <div class="mt-4 flex justify-end space-x-4">
+                ${actionButtons}
+              </div>
+            </div>
+          `;
+        });
+        ordersSection.innerHTML = html;
+      }
+
+      // Cancel order function with confirmation and backend API call
+      async function cancelOrder(orderId) {
+        const confirmCancel = confirm("Are you sure you want to cancel this order?");
+        if (!confirmCancel) return;
+
+        try {
+          const token = localStorage.getItem("jwtToken");
+          if (!token) {
+            alert("You are not authenticated.");
+            return;
+          }
+
+          const response = await fetch(`http://localhost:8081/foodtastenow/orders/common/cancel/${orderId}`, {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to cancel order. Status: ${response.status}`);
+          }
+
+          alert("Order canceled successfully.");
+
+          // Remove the cancel button from the DOM for this order
+          const cancelBtn = document.getElementById(`cancel-btn-${orderId}`);
+          if (cancelBtn) {
+            cancelBtn.remove();
+          }
+        } catch (error) {
+          console.error("Error canceling order:", error);
+          alert("Something went wrong while canceling the order.");
+        }
+      }
+
+      // Help order function (dummy implementation)
+      function helpOrder(orderId) {
+        alert("Help for order: " + orderId);
+        // Add your help logic here
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        updateNavbar();
+        loadOrders();
+      });
+    </script>
+  </body>
+</html>

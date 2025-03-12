@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">User Management</h1>
+
+        <!-- Get All Users -->
+        <div class="mb-6">
+            <button onclick="getAllUsers()" class="bg-blue-500 text-white px-4 py-2 rounded">Get All Users</button>
+            <table class="table-auto w-full mt-4 border">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border px-4 py-2">ID</th>
+                        <th class="border px-4 py-2">Username</th>
+                        <th class="border px-4 py-2">Name</th>
+                        <th class="border px-4 py-2">Email</th>
+                        <th class="border px-4 py-2">Role</th>
+                        <th class="border px-4 py-2">Change Role</th>
+                    </tr>
+                </thead>
+                <tbody id="userList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8080/api/v1/user';
+
+        function getAllUsers() {
+            fetch(`${baseUrl}/getAll`)
+                .then(response => response.json())
+                .then(data => {
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = data.map(user => `
+                        <tr>
+                            <td class="border px-4 py-2">${user.id}</td>
+                            <td class="border px-4 py-2">${user.username}</td>
+                            <td class="border px-4 py-2">${user.name}</td>
+                            <td class="border px-4 py-2">${user.email}</td>
+                            <td class="border px-4 py-2">${user.role}</td>
+                            <td class="border px-4 py-2">
+                                <select onchange="changeRole(${user.id}, this.value)" class="border p-2 rounded">
+                                    <option value="USER" ${user.role === 'USER' ? 'selected' : ''}>User</option>
+                                    <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>Admin</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function changeRole(userId, newRole) {
+            const user = { role: newRole };
+
+            fetch(`${baseUrl}/update/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            }).then(() => {
+                alert('Role updated successfully');
+                getAllUsers();
+            });
+        }
+    </script>
+</body>
+</html>

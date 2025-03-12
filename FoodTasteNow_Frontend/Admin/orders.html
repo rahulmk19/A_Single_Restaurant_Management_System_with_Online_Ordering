@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Order Management</h1>
+
+    <!-- Button to fetch orders -->
+    <div class="mb-6">
+      <button 
+        onclick="getAllOrders()" 
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+      >
+        Get All Orders
+      </button>
+    </div>
+
+    <!-- Table to display orders -->
+    <table class="table-auto w-full mt-4 border">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="border px-4 py-2">Order ID</th>
+          <th class="border px-4 py-2">Customer Name</th>
+          <th class="border px-4 py-2">Contact</th>
+          <th class="border px-4 py-2">Total Amount</th>
+          <th class="border px-4 py-2">Total Quantity</th>
+          <th class="border px-4 py-2">Status</th>
+          <th class="border px-4 py-2">Created At</th>
+          <th class="border px-4 py-2">Order Items</th>
+        </tr>
+      </thead>
+      <tbody id="orderList">
+        <!-- Orders will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Base URL for admin order endpoints (adjust if needed)
+    const BASE_URL = 'http://localhost:8081/foodtastenow/orders/admin';
+
+    // 1. Check if user is logged in and retrieve the token
+    const loginData = JSON.parse(localStorage.getItem("loginData"));
+    if (!loginData || !loginData.token) {
+      // No valid login data found, redirect to login
+      window.location.href = "../Login/login.html";
+    }
+    const token = loginData.token;
+
+    /**
+     * Fetch all orders from the server
+     */
+    async function getAllOrders() {
+      try {
+        const response = await fetch(`${BASE_URL}/getAll`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Send JWT in header
+          }
+        });
+
+        // If response is not OK, throw an error to trigger the catch block
+        if (!response.ok) {
+          throw new Error(`Failed to fetch orders. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        renderOrders(data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        alert("Error fetching orders: " + error.message);
+      }
+    }
+
+    /**
+     * Render orders in the table
+     * @param {Array} orders - array of order objects
+     */
+    function renderOrders(orders) {
+      const orderList = document.getElementById('orderList');
+
+      if (!Array.isArray(orders) || orders.length === 0) {
+        orderList.innerHTML = `
+          <tr>
+            <td colspan="8" class="border px-4 py-2 text-center">No orders found.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      orderList.innerHTML = orders.map(order => `
+        <tr>
+          <td class="border px-4 py-2">${order.orderId}</td>
+          <td class="border px-4 py-2">${order.customerName}</td>
+          <td class="border px-4 py-2">${order.contactNum}</td>
+          <td class="border px-4 py-2">₹${order.totalAmount}</td>
+          <td class="border px-4 py-2">${order.totalQuantity}</td>
+          <td class="border px-4 py-2">${order.status}</td>
+          <td class="border px-4 py-2">${order.createdAt}</td>
+          <td class="border px-4 py-2">
+            <button 
+              onclick="showOrderItems(${order.orderId})" 
+              class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition-colors"
+            >
+              View Items
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /**
+     * Fetch order details by ID and display items
+     * @param {number} orderId
+     */
+    async function showOrderItems(orderId) {
+      try {
+        const response = await fetch(`${BASE_URL}/getById/${orderId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch order ${orderId}. Status: ${response.status}`);
+        }
+
+        const order = await response.json();
+
+        // Format items for display (using a simple alert for demonstration)
+        const itemsText = order.items.map(item => `
+          Item: ${item.menuItemName}
+          Quantity: ${item.quantity}
+          Subtotal: ₹${item.subTotal}
+        `).join('\n\n');
+
+        alert(`Order Items for Order ID: ${orderId}\n\n${itemsText}`);
+      } catch (error) {
+        console.error("Error fetching order details:", error);
+        alert("Error fetching order details: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

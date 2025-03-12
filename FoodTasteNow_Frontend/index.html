@@ -58,9 +58,7 @@
           </div>
           <div class="nav-links hidden md:flex space-x-4" id="navLinks">
             <a href="index.html" class="text-white hover:text-gray-200">Home</a>
-            <a href="category.html" class="text-white hover:text-gray-200"
-              >Category</a
-            >
+            <a href="category.html" class="text-white hover:text-gray-200">Category</a>
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -153,7 +151,6 @@
             </ul>
           </div>
         </div>
-    
         <!-- Right Section: Contact Us -->
         <div class="w-full lg:w-1/3">
           <h2 class="font-semibold mb-4">CONTACT US</h2>
@@ -200,7 +197,7 @@
     <script>
       // Global variables
       let allItems = [];
-      let cartMap = {}; // Mapping of menuItemId to cartItem id
+      let cartMap = {}; // Maps menuItemId to cart item id
 
       // Toggle Mobile Menu
       function toggleMobileMenu() {
@@ -208,7 +205,7 @@
         mobileMenu.classList.toggle("hidden");
       }
 
-      // Retrieve user name from token (if logged in)
+      // Get username from token (if logged in) and redirect if not
       function getNameFromToken() {
         const token = localStorage.getItem("jwtToken");
         if (!token) return null;
@@ -226,7 +223,7 @@
       function updateNavbar() {
         const authDiv = document.getElementById("authSection");
         const name = getNameFromToken();
-        // Remove any existing Cart button if present
+        // Remove existing cart button if any
         const existingCartButton = document.getElementById("cartButton");
         if (existingCartButton) {
           existingCartButton.remove();
@@ -241,13 +238,13 @@
                 </button>
                 <div id="userDropdown" class="dropdown-menu">
                   <a href="profile.html">My Profile</a>
-                  <a href="orders.html">Orders</a>
+                  <a href="Orders/allOrders.html">Orders</a>
                   <a href="coupons.html">Coupon</a>
                   <a href="notifications.html">Notifications</a>
                   <a href="#" id="logout">Logout</a>
                 </div>
               </div>
-              <a id="cartButton" href="/User/cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
+              <a id="cartButton" href="./Cart/cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
                 <i class="fas fa-shopping-cart text-2xl"></i>
                 <span class="text-lg font-normal">Cart</span>
               </a>
@@ -262,25 +259,20 @@
           });
           document.getElementById("logout").addEventListener("click", (e) => {
             e.preventDefault();
-            logout();
+            localStorage.removeItem("jwtToken");
+            window.location.href = "index.html";
           });
-          // Fetch the cart data for logged in user
+          // Fetch cart data to update UI
           fetchCartData();
         } else {
           authDiv.innerHTML = `<a href="User/login.html" class="text-white">Sign In</a>`;
         }
       }
 
-      // Log out functionality
-      function logout() {
-        localStorage.removeItem("jwtToken");
-        window.location.href = "index.html";
-      }
-
-      // Fetch menu items from backend and store in global variable
+      // Fetch all menu items from backend
       async function fetchMenuItems() {
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/api/admin/items/getAll");
+          const response = await fetch("http://localhost:8081/foodtastenow/items/public-api/getAll");
           if (response.ok) {
             allItems = await response.json();
             displayMenuItems(allItems);
@@ -292,27 +284,22 @@
         }
       }
 
-      // Fetch active cart data for the logged in user
+      // Fetch cart data for logged in user
       async function fetchCartData() {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/api/cart", {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
+          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
+            headers: { "Authorization": `Bearer ${token}` }
           });
           if (response.ok) {
             const cart = await response.json();
-            // Reset cartMap
             cartMap = {};
-            if (cart.cardItem && Array.isArray(cart.cardItem)) {
-              cart.cardItem.forEach(item => {
+            if (cart.cartItem && Array.isArray(cart.cartItem)) {
+              cart.cartItem.forEach(item => {
                 cartMap[item.menuItem.id] = item.id;
               });
             }
-            // Update cart badge
             updateCartBadge(cart);
-            // Refresh menu items display to update button text
             displayMenuItems(allItems);
           } else {
             console.error("Failed to fetch cart data");
@@ -322,15 +309,14 @@
         }
       }
 
-      // Display menu items in a responsive grid
+      // Display menu items in grid layout
       function displayMenuItems(items) {
         const menuItemsContainer = document.getElementById("menuItems");
         menuItemsContainer.innerHTML = "";
         const isLoggedIn = getNameFromToken() !== null;
         items.forEach((item) => {
           const itemCard = document.createElement("div");
-          itemCard.className =
-            "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
+          itemCard.className = "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
           itemCard.innerHTML = `
             <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4">
             <h2 class="text-xl font-bold mb-2 text-gray-800">${item.name}</h2>
@@ -338,10 +324,8 @@
             <p class="text-red-500 text-lg font-semibold mb-4">₹${item.price.toFixed(2)}</p>
           `;
           const cartButton = document.createElement("button");
-          cartButton.className =
-            "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors";
+          cartButton.className = "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors";
           if (isLoggedIn) {
-            // Set button text based on cartMap status
             if (cartMap[item.id]) {
               cartButton.textContent = "Remove from Cart";
               cartButton.classList.remove("bg-blue-500", "hover:bg-blue-600");
@@ -349,10 +333,9 @@
             } else {
               cartButton.textContent = "Add to Cart";
             }
-            cartButton.addEventListener("click", () =>
-              toggleCartItem(item.id, cartButton)
-            );
+            cartButton.addEventListener("click", () => toggleCartItem(item.id, cartButton));
           } else {
+            cartButton.textContent = "Add to Cart";
             cartButton.addEventListener("click", () => {
               window.location.href = "User/login.html";
             });
@@ -362,23 +345,22 @@
         });
       }
 
+      // Add item to cart using your API endpoint
       async function addToCart(menuItemId, button) {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/api/cart/items", {
+          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/save/${menuItemId}`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ menuItemId: menuItemId, quantity: 1 })
+            headers: { "Authorization": `Bearer ${token}` }
           });
           if (response.ok) {
             const cart = await response.json();
-            // Find the added cart item in the response
-            let addedCartItem = cart.cardItem.find(item => item.menuItem.id == menuItemId);
-            if (addedCartItem) {
-              cartMap[menuItemId] = addedCartItem.id;
+            if (cart.cartItem && Array.isArray(cart.cartItem)) {
+              cart.cartItem.forEach(item => {
+                if (item.menuItem.id === menuItemId) {
+                  cartMap[menuItemId] = item.id;
+                }
+              });
             }
             button.textContent = "Remove from Cart";
             button.classList.remove("bg-blue-500", "hover:bg-blue-600");
@@ -392,24 +374,21 @@
         }
       }
 
+      // Remove item from cart using your DELETE endpoint
       async function removeFromCart(menuItemId, button) {
         const token = localStorage.getItem("jwtToken");
-        const cartItemId = cartMap[menuItemId];
-        if (!cartItemId) return;
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/api/cart/items/${cartItemId}`, {
+          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`, {
             method: "DELETE",
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
+            headers: { "Authorization": `Bearer ${token}` }
           });
           if (response.ok) {
+            const cart = await response.json();
             delete cartMap[menuItemId];
             button.textContent = "Add to Cart";
             button.classList.remove("bg-red-500", "hover:bg-red-600");
             button.classList.add("bg-blue-500", "hover:bg-blue-600");
-            // Refresh cart data to update badge
-            fetchCartData();
+            updateCartBadge(cart);
           } else {
             console.error("Failed to remove item from cart");
           }
@@ -418,16 +397,16 @@
         }
       }
 
+      // Toggle between adding and removing item from cart
       function toggleCartItem(menuItemId, button) {
         if (cartMap[menuItemId]) {
-          // If already in cart, remove it
           removeFromCart(menuItemId, button);
         } else {
-          // Add to cart
           addToCart(menuItemId, button);
         }
       }
 
+      // Update the cart badge with total quantity from cart response
       function updateCartBadge(cart) {
         const cartButton = document.getElementById("cartButton");
         if (cartButton) {
@@ -438,22 +417,18 @@
             badge.className = "bg-yellow-500 text-black rounded-full px-2 ml-2";
             cartButton.appendChild(badge);
           }
-          badge.textContent = cart.totalQty;
+          badge.textContent = cart.totalQty || 0;
         }
       }
 
-      // Search functionality: filters items based on search input
-      document
-        .getElementById("searchInput")
-        .addEventListener("input", function () {
-          const query = this.value.trim().toLowerCase();
-          const filtered = allItems.filter((item) =>
-            item.name.toLowerCase().includes(query)
-          );
-          displayMenuItems(filtered);
-        });
+      // Search functionality
+      document.getElementById("searchInput").addEventListener("input", function () {
+        const query = this.value.trim().toLowerCase();
+        const filtered = allItems.filter((item) => item.name.toLowerCase().includes(query));
+        displayMenuItems(filtered);
+      });
 
-      // On DOMContentLoaded, update navbar and fetch items
+      // Initialize when DOM content is loaded
       document.addEventListener("DOMContentLoaded", () => {
         updateNavbar();
         fetchMenuItems();

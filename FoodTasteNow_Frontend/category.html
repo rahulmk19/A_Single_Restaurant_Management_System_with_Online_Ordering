@@ -232,7 +232,7 @@
       ------------------------------- */
       async function fetchCategoryItems() {
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/api/admin/items/getAll");
+          const response = await fetch("http://localhost:8081/foodtastenow/items/public-api/getAll");
           if (response.ok) {
             allItems = await response.json();
             applyFilters();

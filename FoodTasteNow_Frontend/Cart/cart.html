@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart - FoodTasteNow</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHqT7LKy2tT1Y4B6L5/6x3Z4I3V9B+4uX1Rm2B0s1KjF9xzp2KVVjvbHAfO9wDVWD1Z5gXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Dropdown styling */
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        z-index: 50;
+      }
+      .dropdown-menu a {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #333;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+      .dropdown-menu a:hover {
+        background-color: #f1f1f1;
+      }
+      .open .dropdown-menu {
+        display: block;
+      }
+      /* Make room for fixed header */
+      body {
+        padding-top: 80px;
+      }
+      /* Modal Styles */
+      #orderModal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 100;
+      }
+      #orderModal.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Fixed Navbar (Header) -->
+    <nav class="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg z-50">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-6">
+          <div class="logo">
+            <!-- Use ../ to go from Cart/ folder to project root -->
+            <a href="../index.html" class="text-white font-extrabold text-3xl tracking-wide">
+              FoodTasteNow
+            </a>
+          </div>
+          <div class="nav-links hidden md:flex space-x-4" id="navLinks">
+            <a href="../index.html" class="text-white hover:text-gray-200">Home</a>
+            <a href="../category.html" class="text-white hover:text-gray-200">Category</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="auth" id="authSection">
+            <!-- Will be updated by updateNavbar() -->
+            <a href="../User/login.html" class="text-white">Sign In</a>
+          </div>
+          <button class="md:hidden text-white focus:outline-none" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu hidden md:hidden bg-red-500 text-white p-4 fixed top-16 w-full z-40">
+      <a href="../index.html" class="block py-2">Home</a>
+      <a href="../category.html" class="block py-2">Category</a>
+      <a href="../User/login.html" class="block py-2">Sign In</a>
+    </div>
+
+    <!-- Cart Content -->
+    <div class="container mx-auto pt-20 px-4">
+      <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
+      <div id="cartContainer">
+        <p>Loading your cart...</p>
+      </div>
+      <div id="cartSummary" class="mt-6"></div>
+      <div class="mt-6">
+        <button id="placeOrderButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+          Place Order
+        </button>
+      </div>
+    </div>
+
+    <!-- Order Modal (Hidden by default) -->
+    <div id="orderModal" class="hidden">
+      <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2">
+        <h2 class="text-2xl font-bold mb-4">Enter Customer Details</h2>
+        <form id="orderForm">
+          <div class="mb-4">
+            <label class="block text-gray-700">Customer Name:</label>
+            <input
+              type="text"
+              id="customerName"
+              placeholder="Enter your name"
+              class="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Customer Address:</label>
+            <input
+              type="text"
+              id="customerAddress"
+              placeholder="Enter your address"
+              class="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Contact Number:</label>
+            <input
+              type="text"
+              id="contactNum"
+              placeholder="Enter contact number"
+              class="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Alternate Contact Number:</label>
+            <input
+              type="text"
+              id="alternateContactNum"
+              placeholder="Enter alternate contact number"
+              class="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div class="flex justify-end">
+            <button type="button" id="cancelOrderModal" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded mr-2">
+              Cancel
+            </button>
+            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+              Place Order
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Toggle Mobile Menu
+      function toggleMobileMenu() {
+        const mobileMenu = document.getElementById("mobileMenu");
+        mobileMenu.classList.toggle("hidden");
+      }
+
+      // Get user name from token (if logged in)
+      function getNameFromToken() {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) return null;
+        try {
+          const payloadBase64 = token.split(".")[1];
+          const payload = JSON.parse(atob(payloadBase64));
+          return payload.name || payload.sub || null;
+        } catch (error) {
+          console.error("Error decoding token:", error);
+          return null;
+        }
+      }
+
+      // Update Navbar based on login status
+      function updateNavbar() {
+        const authDiv = document.getElementById("authSection");
+        const name = getNameFromToken();
+        if (name) {
+          authDiv.innerHTML = `
+            <div class="flex items-center space-x-4">
+              <div class="relative inline-block" id="userDropdownContainer">
+                <button id="userDropdownButton" class="text-white focus:outline-none inline-flex items-center">
+                  <span>${name}</span>
+                  <i class="fas fa-caret-down ml-1"></i>
+                </button>
+                <div id="userDropdown" class="dropdown-menu">
+                  <a href="../profile.html">My Profile</a>
+                  <a href="../Orders/allOrders.html">Orders</a>
+                  <a href="../coupons.html">Coupon</a>
+                  <a href="../notifications.html">Notifications</a>
+                  <a href="#" id="logout">Logout</a>
+                </div>
+              </div>
+              <a id="cartButton" href="cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
+                <i class="fas fa-shopping-cart text-2xl"></i>
+                <span class="text-lg font-normal">Cart</span>
+              </a>
+            </div>
+          `;
+          const dropdownContainer = document.getElementById("userDropdownContainer");
+          dropdownContainer.addEventListener("mouseenter", () => {
+            dropdownContainer.classList.add("open");
+          });
+          dropdownContainer.addEventListener("mouseleave", () => {
+            dropdownContainer.classList.remove("open");
+          });
+          document.getElementById("logout").addEventListener("click", (e) => {
+            e.preventDefault();
+            localStorage.removeItem("jwtToken");
+            window.location.href = "../index.html";
+          });
+          fetchCartData();
+        } else {
+          authDiv.innerHTML = `<a href="../User/login.html" class="text-white">Sign In</a>`;
+        }
+      }
+
+      // Fetch cart data for logged in user
+      async function fetchCart() {
+        const token = localStorage.getItem("jwtToken");
+        try {
+          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const cart = await response.json();
+            renderCart(cart);
+          } else {
+            console.error("Failed to fetch cart data");
+          }
+        } catch (error) {
+          console.error("Error fetching cart data:", error);
+        }
+      }
+
+      // Render cart items and summary.
+      function renderCart(cart) {
+        const container = document.getElementById("cartContainer");
+        container.innerHTML = "";
+        if (!cart.cartItem || cart.cartItem.length === 0) {
+          container.innerHTML = "<p>Your cart is empty.</p>";
+          document.getElementById("cartSummary").innerHTML = "";
+          return;
+        }
+        cart.cartItem.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "flex items-center bg-white p-4 rounded shadow mb-4";
+          div.innerHTML = `
+            <img src="${item.menuItem.imageUrl}" alt="${item.menuItem.name}" class="w-24 h-24 object-cover rounded mr-4">
+            <div class="flex-1">
+              <h2 class="text-xl font-bold">${item.menuItem.name}</h2>
+              <p class="text-gray-600">Price: ₹${item.menuItem.price.toFixed(2)}</p>
+              <p class="text-gray-600">Subtotal: ₹${item.subTotal.toFixed(2)}</p>
+              <div class="flex items-center mt-2">
+                <button onclick="changeQuantity(${item.menuItem.id}, ${item.quantity - 1})" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">-</button>
+                <span class="mx-2">${item.quantity}</span>
+                <button onclick="changeQuantity(${item.menuItem.id}, ${item.quantity + 1})" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">+</button>
+              </div>
+            </div>
+            <div>
+              <button onclick="removeCartItem(${item.menuItem.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Remove</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+        const summary = document.getElementById("cartSummary");
+        summary.innerHTML = `<p class="text-xl">Total Items: ${cart.totalQty}</p>
+                             <p class="text-xl">Total Amount: ₹${cart.totalAmount.toFixed(2)}</p>`;
+      }
+
+      // Update quantity using the PATCH endpoint.
+      async function changeQuantity(menuItemId, newQuantity) {
+        if (newQuantity < 1) {
+          removeCartItem(menuItemId);
+          return;
+        }
+        const token = localStorage.getItem("jwtToken");
+        try {
+          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/update/${menuItemId}/${newQuantity}`, {
+            method: "PATCH",
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const cart = await response.json();
+            renderCart(cart);
+          } else {
+            console.error("Failed to update quantity");
+          }
+        } catch (error) {
+          console.error("Error updating quantity:", error);
+        }
+      }
+
+      // Remove an item from the cart using the DELETE endpoint.
+      async function removeCartItem(menuItemId) {
+        const token = localStorage.getItem("jwtToken");
+        try {
+          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const cart = await response.json();
+            renderCart(cart);
+          } else {
+            console.error("Failed to remove item");
+          }
+        } catch (error) {
+          console.error("Error removing item:", error);
+        }
+      }
+
+      // Optional: Fetch cart data to update the navbar badge.
+      async function fetchCartData() {
+        const token = localStorage.getItem("jwtToken");
+        try {
+          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const cart = await response.json();
+            updateCartBadge(cart);
+          }
+        } catch (error) {
+          console.error("Error fetching cart data:", error);
+        }
+      }
+
+      // Update the cart badge with total quantity.
+      function updateCartBadge(cart) {
+        const cartButton = document.getElementById("cartButton");
+        if (cartButton) {
+          let badge = document.getElementById("cartBadge");
+          if (!badge) {
+            badge = document.createElement("span");
+            badge.id = "cartBadge";
+            badge.className = "bg-yellow-500 text-black rounded-full px-2 ml-2";
+            cartButton.appendChild(badge);
+          }
+          badge.textContent = cart.totalQty || 0;
+        }
+      }
+
+      // Show the order modal to collect customer details.
+      function showOrderModal() {
+        document.getElementById("orderModal").classList.remove("hidden");
+      }
+
+      // Hide the order modal.
+      function hideOrderModal() {
+        document.getElementById("orderModal").classList.add("hidden");
+      }
+
+      // Handle the order form submission with validation.
+      document.getElementById("orderForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const customerName = document.getElementById("customerName").value.trim();
+  const customerAddress = document.getElementById("customerAddress").value.trim();
+  const contactNum = document.getElementById("contactNum").value.trim();
+  const alternateContactNum = document.getElementById("alternateContactNum").value.trim();
+
+  // Client-side validation: All fields must be provided.
+  if (!customerName || !customerAddress || !contactNum || !alternateContactNum) {
+    alert("Please provide all customer details before placing the order.");
+    return;
+  }
+
+  // Build the payload.
+  const orderDetails = {
+    customerName,
+    customerAddress,
+    contactNum,
+    alternateContactNum
+  };
+
+  const token = localStorage.getItem("jwtToken");
+  try {
+    const response = await fetch("http://localhost:8081/foodtastenow/cart/user/placedorder", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(orderDetails)
+    });
+    if (response.ok) {
+      const orderResponse = await response.json();
+      alert("Order placed successfully!");
+      hideOrderModal();
+      // Fetch updated cart data to update the badge (which should now be zero)
+      await fetchCartData();
+      // Then redirect to the orders page
+      window.location.href = "../Orders/allOrders.html";
+    } else {
+      console.error("Failed to place order");
+    }
+  } catch (error) {
+    console.error("Error placing order:", error);
+  }
+});
+
+
+      // Cancel button for order modal.
+      document.getElementById("cancelOrderModal").addEventListener("click", hideOrderModal);
+
+      // When Place Order button is clicked, show the modal form.
+      document.getElementById("placeOrderButton").addEventListener("click", () => {
+        if (!getNameFromToken()) {
+          window.location.href = "../User/login.html";
+          return;
+        }
+        showOrderModal();
+      });
+
+      // Initialize on page load.
+      document.addEventListener("DOMContentLoaded", () => {
+        updateNavbar();
+        fetchCart();
+      });
+    </script>
+  </body>
+</html>
