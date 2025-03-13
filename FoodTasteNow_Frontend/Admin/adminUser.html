@@ -1,74 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-4">
+  </head>
+  <body class="bg-gray-100">
+    <!-- Navbar -->
+    <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+      <h2 class="text-3xl font-bold">Admin Dashboard</h2>
+      <div>
+        <span id="welcomeMsg" class="mr-4 text-lg"></span>
+        <button onclick="profile()" class="bg-blue-500 px-4 py-2 rounded text-lg">
+          Profile
+        </button>
+        <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded text-lg">
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="flex">
+      <!-- Sidebar -->
+      <div class="w-64 bg-blue-600 text-white h-screen p-5">
+        <ul>
+          <li class="mb-6 text-lg">
+            <a href="./orders.html" class="hover:underline">📜 Orders</a>
+          </li>
+          <li class="mb-6 text-lg">
+            <a href="./menuItem.html" class="hover:underline">📦 Products</a>
+          </li>
+          <li class="mb-6 text-lg">
+            <a href="./userManagement.html" class="hover:underline">👥 Users</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 p-5 overflow-auto">
         <h1 class="text-2xl font-bold mb-4">User Management</h1>
 
-        <!-- Get All Users -->
-        <div class="mb-6">
-            <button onclick="getAllUsers()" class="bg-blue-500 text-white px-4 py-2 rounded">Get All Users</button>
-            <table class="table-auto w-full mt-4 border">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border px-4 py-2">ID</th>
-                        <th class="border px-4 py-2">Username</th>
-                        <th class="border px-4 py-2">Name</th>
-                        <th class="border px-4 py-2">Email</th>
-                        <th class="border px-4 py-2">Role</th>
-                        <th class="border px-4 py-2">Change Role</th>
-                    </tr>
-                </thead>
-                <tbody id="userList"></tbody>
-            </table>
+        <!-- Filter Panel -->
+        <div class="mb-4 flex flex-wrap gap-4 items-center">
+          <div>
+            <input
+              type="text"
+              id="filterUsername"
+              placeholder="Filter by Username"
+              class="border p-2 rounded"
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              id="filterMobile"
+              placeholder="Filter by Mobile Number"
+              class="border p-2 rounded"
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              id="filterEmail"
+              placeholder="Filter by Email"
+              class="border p-2 rounded"
+            />
+          </div>
+          <div>
+            <button
+              onclick="filterUsers()"
+              class="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Filter
+            </button>
+            <button
+              onclick="renderUsers(allUsers)"
+              class="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+            >
+              Reset Filters
+            </button>
+          </div>
         </div>
+
+        <!-- Users Table -->
+        <table class="table-auto w-full mt-4 border">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="border px-4 py-2">ID</th>
+              <th class="border px-4 py-2">Username</th>
+              <th class="border px-4 py-2">Name</th>
+              <th class="border px-4 py-2">Email</th>
+              <th class="border px-4 py-2">Mobile Number</th>
+              <th class="border px-4 py-2">Role</th>
+              <th class="border px-4 py-2">Status</th>
+              <th class="border px-4 py-2">Delete User</th>
+            </tr>
+          </thead>
+          <tbody id="userList">
+            <!-- Users will be dynamically inserted here -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <script>
-        const baseUrl = 'http://localhost:8080/api/v1/user';
+      // Base URL configuration
+      const baseUrl = "http://localhost:8081/foodtastenow/users";
+      const ADMIN_BASE_URL = `${baseUrl}/admin`;
+      let allUsers = [];
 
-        function getAllUsers() {
-            fetch(`${baseUrl}/getAll`)
-                .then(response => response.json())
-                .then(data => {
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = data.map(user => `
-                        <tr>
-                            <td class="border px-4 py-2">${user.id}</td>
-                            <td class="border px-4 py-2">${user.username}</td>
-                            <td class="border px-4 py-2">${user.name}</td>
-                            <td class="border px-4 py-2">${user.email}</td>
-                            <td class="border px-4 py-2">${user.role}</td>
-                            <td class="border px-4 py-2">
-                                <select onchange="changeRole(${user.id}, this.value)" class="border p-2 rounded">
-                                    <option value="USER" ${user.role === 'USER' ? 'selected' : ''}>User</option>
-                                    <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>Admin</option>
-                                </select>
-                            </td>
-                        </tr>
-                    `).join('');
-                });
+      // Check JWT authentication and admin role before making API calls
+      const loginData = JSON.parse(localStorage.getItem("loginData"));
+      if (!loginData || !loginData.token) {
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("loginData");
+        window.location.href = "../User/login.html";
+      }
+      if (loginData.roles !== "ADMIN") {
+        alert("Access denied. Only admin users can access this page.");
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("loginData");
+        window.location.href = "../User/login.html";
+      }
+
+      const token = loginData.token;
+
+      // Set welcome message using username from authentication
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("welcomeMsg").textContent = `Welcome, ${loginData.username}`;
+        getAllUsers();
+      });
+
+      function getAllUsers() {
+        fetch(`${ADMIN_BASE_URL}/getAll`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            allUsers = data;
+            renderUsers(allUsers);
+          })
+          .catch((error) => {
+            console.error("Error fetching users:", error);
+            alert("Error fetching users: " + error.message);
+          });
+      }
+
+      function renderUsers(users) {
+        const userList = document.getElementById("userList");
+        if (!Array.isArray(users) || users.length === 0) {
+          userList.innerHTML = `<tr>
+            <td colspan="8" class="border px-4 py-2 text-center">No users found.</td>
+          </tr>`;
+          return;
         }
+        userList.innerHTML = users
+          .map(
+            (user) => `
+          <tr>
+            <td class="border px-4 py-2">${user.id}</td>
+            <td class="border px-4 py-2">${user.username}</td>
+            <td class="border px-4 py-2">${user.name}</td>
+            <td class="border px-4 py-2">${user.email}</td>
+            <td class="border px-4 py-2">${user.mobileNumber || ""}</td>
+            <td class="border px-4 py-2">
+              <select data-old-role="${user.roles}" onchange="confirmChangeRole(this, ${user.id})" class="border p-2 rounded">
+                <option value="USER" ${user.roles === "USER" ? "selected" : ""}>USER</option>
+                <option value="ADMIN" ${user.roles === "ADMIN" ? "selected" : ""}>ADMIN</option>
+              </select>
+            </td>
+            <td class="border px-4 py-2">${user.active ? "Active" : "Inactive"}</td>
+            <td class="border px-4 py-2">
+              <button onclick="confirmDeleteUser(${user.id})" class="bg-red-500 text-white px-2 py-1 rounded">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+      }
 
-        function changeRole(userId, newRole) {
-            const user = { role: newRole };
-
-            fetch(`${baseUrl}/update/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(user)
-            }).then(() => {
-                alert('Role updated successfully');
-                getAllUsers();
-            });
+      // Function to handle role change confirmation
+      function confirmChangeRole(selectElement, userId) {
+        const newRole = selectElement.value;
+        const oldRole = selectElement.getAttribute("data-old-role");
+        if (confirm("Are you sure you want to change the role of this user?")) {
+          changeRole(userId, newRole, selectElement);
+        } else {
+          // Revert to the original role if canceled
+          selectElement.value = oldRole;
         }
+      }
+
+      // Function to perform role change API call
+      function changeRole(userId, newRole, selectElement) {
+        const user = { role: newRole };
+        fetch(`${ADMIN_BASE_URL}/update/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(user),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to update role");
+            }
+            return response.json();
+          })
+          .then(() => {
+            alert("Role updated successfully");
+            // Update the data-old-role attribute to the new role
+            selectElement.setAttribute("data-old-role", newRole);
+            getAllUsers();
+          })
+          .catch((error) => {
+            console.error("Error updating role:", error);
+            alert("Error updating role: " + error.message);
+            // Revert selection if an error occurs
+            selectElement.value = selectElement.getAttribute("data-old-role");
+          });
+      }
+
+      // Function to handle delete user confirmation
+      function confirmDeleteUser(userId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+          deleteUser(userId);
+        }
+      }
+
+      function deleteUser(userId) {
+        fetch(`${ADMIN_BASE_URL}/delete/${userId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to delete user");
+            }
+            return response.text();
+          })
+          .then(() => {
+            alert("User deleted successfully");
+            getAllUsers();
+          })
+          .catch((error) => {
+            console.error("Error deleting user:", error);
+            alert("Error deleting user: " + error.message);
+          });
+      }
+
+      function filterUsers() {
+        const usernameFilter = document
+          .getElementById("filterUsername")
+          .value.trim()
+          .toLowerCase();
+        const mobileFilter = document
+          .getElementById("filterMobile")
+          .value.trim()
+          .toLowerCase();
+        const emailFilter = document
+          .getElementById("filterEmail")
+          .value.trim()
+          .toLowerCase();
+        const filtered = allUsers.filter((user) => {
+          return (
+            (!usernameFilter ||
+              user.username.toLowerCase().includes(usernameFilter)) &&
+            (!mobileFilter ||
+              (user.mobileNumber &&
+                user.mobileNumber.toLowerCase().includes(mobileFilter))) &&
+            (!emailFilter || user.email.toLowerCase().includes(emailFilter))
+          );
+        });
+        renderUsers(filtered);
+      }
+
+      function logout() {
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("loginData");
+        window.location.href = "../User/login.html";
+      }
+
+      function profile() {
+        // Redirect to the profile page (adjust the URL as needed)
+        window.location.href = "../User/profile.html";
+      }
     </script>
-</body>
+  </body>
 </html>

@@ -103,6 +103,7 @@
       
       function logout() {
         localStorage.removeItem("jwtToken");
+        localStorage.removeItem('loginData');
         window.location.href = "index.html";
       }
       

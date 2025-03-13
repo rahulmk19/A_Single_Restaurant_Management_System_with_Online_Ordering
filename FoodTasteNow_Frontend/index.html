@@ -58,7 +58,9 @@
           </div>
           <div class="nav-links hidden md:flex space-x-4" id="navLinks">
             <a href="index.html" class="text-white hover:text-gray-200">Home</a>
-            <a href="category.html" class="text-white hover:text-gray-200">Category</a>
+            <a href="category.html" class="text-white hover:text-gray-200"
+              >Category</a
+            >
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -129,7 +131,9 @@
             <ul>
               <li><a href="#" class="hover:underline">Payments</a></li>
               <li><a href="#" class="hover:underline">Shipping</a></li>
-              <li><a href="#" class="hover:underline">Cancellation & Returns</a></li>
+              <li>
+                <a href="#" class="hover:underline">Cancellation & Returns</a>
+              </li>
               <li><a href="#" class="hover:underline">FAQ</a></li>
             </ul>
           </div>
@@ -156,44 +160,84 @@
           <h2 class="font-semibold mb-4">CONTACT US</h2>
           <ul class="space-y-3">
             <li>
-              <a href="https://www.instagram.com" target="_blank" class="flex items-center hover:underline">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png" class="mr-2" alt="Instagram">
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                class="flex items-center hover:underline"
+              >
+                <img
+                  src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png"
+                  class="mr-2"
+                  alt="Instagram"
+                />
                 Instagram
               </a>
             </li>
             <li>
-              <a href="https://www.facebook.com" target="_blank" class="flex items-center hover:underline">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-circled--v1.png" class="mr-2" alt="Facebook">
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                class="flex items-center hover:underline"
+              >
+                <img
+                  src="https://img.icons8.com/ios-filled/24/ffffff/facebook-circled--v1.png"
+                  class="mr-2"
+                  alt="Facebook"
+                />
                 Facebook
               </a>
             </li>
             <li>
-              <a href="mailto:rahulmk.94802@gmail.com" class="flex items-center hover:underline">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/email.png" class="mr-2" alt="Email">
+              <a
+                href="mailto:rahulmk.94802@gmail.com"
+                class="flex items-center hover:underline"
+              >
+                <img
+                  src="https://img.icons8.com/ios-filled/24/ffffff/email.png"
+                  class="mr-2"
+                  alt="Email"
+                />
                 Email
               </a>
             </li>
             <li>
-              <a href="https://rahulmk19.github.io/" target="_blank" class="flex items-center hover:underline">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/internet.png" class="mr-2" alt="Portfolio">
+              <a
+                href="https://rahulmk19.github.io/"
+                target="_blank"
+                class="flex items-center hover:underline"
+              >
+                <img
+                  src="https://img.icons8.com/ios-filled/24/ffffff/internet.png"
+                  class="mr-2"
+                  alt="Portfolio"
+                />
                 Portfolio
               </a>
             </li>
             <li>
-              <a href="tel:1234567890" class="flex items-center hover:underline">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/phone.png" class="mr-2" alt="Phone">
+              <a
+                href="tel:1234567890"
+                class="flex items-center hover:underline"
+              >
+                <img
+                  src="https://img.icons8.com/ios-filled/24/ffffff/phone.png"
+                  class="mr-2"
+                  alt="Phone"
+                />
                 +91 766-786-9850
               </a>
             </li>
           </ul>
         </div>
       </div>
-    
-      <div class="container mx-auto mt-8 border-t border-gray-700 pt-4 text-center text-sm">
+
+      <div
+        class="container mx-auto mt-8 border-t border-gray-700 pt-4 text-center text-sm"
+      >
         © 2025 FoodTasteNow Pvt Ltd. All rights reserved.
       </div>
     </footer>
-    
+
     <script>
       // Global variables
       let allItems = [];
@@ -205,14 +249,42 @@
         mobileMenu.classList.toggle("hidden");
       }
 
-      // Get username from token (if logged in) and redirect if not
+      // Decode the JWT and return firstName or username
       function getNameFromToken() {
         const token = localStorage.getItem("jwtToken");
         if (!token) return null;
         try {
           const payloadBase64 = token.split(".")[1];
           const payload = JSON.parse(atob(payloadBase64));
-          return payload.name || payload.sub || null;
+          // Adjust if your JWT includes firstName, username, name, sub, etc.
+          return (
+            payload.firstName ||
+            payload.username ||
+            payload.name ||
+            payload.sub ||
+            null
+          );
+        } catch (error) {
+          console.error("Error decoding token:", error);
+          return null;
+        }
+      }
+
+      // Decode the JWT and return the roles
+      function getUserRoleFromToken() {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) return null;
+
+        try {
+          const payloadBase64 = token.split(".")[1];
+          const payload = JSON.parse(atob(payloadBase64));
+
+          // If there's at least one authority, return it
+          if (payload.authorities && payload.authorities.length > 0) {
+            return payload.authorities[0].authority; // e.g. "ROLE_USER" or "ROLE_ADMIN"
+          } else {
+            return null;
+          }
         } catch (error) {
           console.error("Error decoding token:", error);
           return null;
@@ -223,56 +295,77 @@
       function updateNavbar() {
         const authDiv = document.getElementById("authSection");
         const name = getNameFromToken();
+        const role = getUserRoleFromToken();
+
         // Remove existing cart button if any
         const existingCartButton = document.getElementById("cartButton");
         if (existingCartButton) {
           existingCartButton.remove();
         }
-        if (name) {
-          authDiv.innerHTML = `
-            <div class="flex items-center space-x-4">
-              <div class="relative inline-block" id="userDropdownContainer">
-                <button id="userDropdownButton" class="text-white focus:outline-none inline-flex items-center">
-                  <span>${name}</span>
-                  <i class="fas fa-caret-down ml-1"></i>
-                </button>
-                <div id="userDropdown" class="dropdown-menu">
-                  <a href="profile.html">My Profile</a>
-                  <a href="Orders/allOrders.html">Orders</a>
-                  <a href="coupons.html">Coupon</a>
-                  <a href="notifications.html">Notifications</a>
-                  <a href="#" id="logout">Logout</a>
-                </div>
-              </div>
-              <a id="cartButton" href="./Cart/cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
-                <i class="fas fa-shopping-cart text-2xl"></i>
-                <span class="text-lg font-normal">Cart</span>
-              </a>
-            </div>
-          `;
-          const dropdownContainer = document.getElementById("userDropdownContainer");
-          dropdownContainer.addEventListener("mouseenter", () => {
-            dropdownContainer.classList.add("open");
-          });
-          dropdownContainer.addEventListener("mouseleave", () => {
-            dropdownContainer.classList.remove("open");
-          });
-          document.getElementById("logout").addEventListener("click", (e) => {
-            e.preventDefault();
-            localStorage.removeItem("jwtToken");
-            window.location.href = "index.html";
-          });
-          // Fetch cart data to update UI
-          fetchCartData();
-        } else {
+
+        // If user is not logged in, just show "Sign In"
+        if (!name) {
           authDiv.innerHTML = `<a href="User/login.html" class="text-white">Sign In</a>`;
+          return;
         }
+        // If user is admin, redirect to admin dashboard
+        if (role === "ROLE_ADMIN") {
+          window.location.href = "/Admin/adminDashboard.html";
+          return;
+        }
+
+        // Otherwise, show normal user navbar
+        authDiv.innerHTML = `
+          <div class="flex items-center space-x-4">
+            <div class="relative inline-block" id="userDropdownContainer">
+              <button id="userDropdownButton" class="text-white focus:outline-none inline-flex items-center">
+                <span>${name}</span>
+                <i class="fas fa-caret-down ml-1"></i>
+              </button>
+              <div id="userDropdown" class="dropdown-menu">
+                <a href="profile.html">My Profile</a>
+                <a href="Orders/allOrders.html">Orders</a>
+                <a href="coupons.html">Coupon</a>
+                <a href="notifications.html">Notifications</a>
+                <a href="#" id="logout">Logout</a>
+              </div>
+            </div>
+            <a id="cartButton" href="./Cart/cart.html" class="bg-green-500 text-white border border-green-500 px-6 py-2 rounded-full hover:bg-green-600 flex items-center justify-center space-x-2">
+              <i class="fas fa-shopping-cart text-2xl"></i>
+              <span class="text-lg font-normal">Cart</span>
+            </a>
+          </div>
+        `;
+
+        // Dropdown events
+        const dropdownContainer = document.getElementById(
+          "userDropdownContainer"
+        );
+        dropdownContainer.addEventListener("mouseenter", () => {
+          dropdownContainer.classList.add("open");
+        });
+        dropdownContainer.addEventListener("mouseleave", () => {
+          dropdownContainer.classList.remove("open");
+        });
+
+        // Logout
+        document.getElementById("logout").addEventListener("click", (e) => {
+          e.preventDefault();
+          localStorage.removeItem("jwtToken");
+          localStorage.removeItem('loginData');
+          window.location.href = "index.html";
+        });
+
+        // Fetch cart data to update UI
+        fetchCartData();
       }
 
       // Fetch all menu items from backend
       async function fetchMenuItems() {
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/items/public-api/getAll");
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/items/public-api/getAll"
+          );
           if (response.ok) {
             allItems = await response.json();
             displayMenuItems(allItems);
@@ -287,15 +380,19 @@
       // Fetch cart data for logged in user
       async function fetchCartData() {
         const token = localStorage.getItem("jwtToken");
+        if (!token) return;
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/cart/user",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             cartMap = {};
             if (cart.cartItem && Array.isArray(cart.cartItem)) {
-              cart.cartItem.forEach(item => {
+              cart.cartItem.forEach((item) => {
                 cartMap[item.menuItem.id] = item.id;
               });
             }
@@ -314,17 +411,26 @@
         const menuItemsContainer = document.getElementById("menuItems");
         menuItemsContainer.innerHTML = "";
         const isLoggedIn = getNameFromToken() !== null;
+
         items.forEach((item) => {
           const itemCard = document.createElement("div");
-          itemCard.className = "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
+          itemCard.className =
+            "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
           itemCard.innerHTML = `
-            <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+            <img src="${item.imageUrl}" alt="${
+            item.name
+          }" class="w-full h-48 object-cover rounded-lg mb-4">
             <h2 class="text-xl font-bold mb-2 text-gray-800">${item.name}</h2>
             <p class="text-gray-600 mb-2">Category: ${item.category}</p>
-            <p class="text-red-500 text-lg font-semibold mb-4">₹${item.price.toFixed(2)}</p>
+            <p class="text-red-500 text-lg font-semibold mb-4">₹${item.price.toFixed(
+              2
+            )}</p>
           `;
+
           const cartButton = document.createElement("button");
-          cartButton.className = "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors";
+          cartButton.className =
+            "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors";
+
           if (isLoggedIn) {
             if (cartMap[item.id]) {
               cartButton.textContent = "Remove from Cart";
@@ -333,30 +439,36 @@
             } else {
               cartButton.textContent = "Add to Cart";
             }
-            cartButton.addEventListener("click", () => toggleCartItem(item.id, cartButton));
+            cartButton.addEventListener("click", () =>
+              toggleCartItem(item.id, cartButton)
+            );
           } else {
             cartButton.textContent = "Add to Cart";
             cartButton.addEventListener("click", () => {
               window.location.href = "User/login.html";
             });
           }
+
           itemCard.appendChild(cartButton);
           menuItemsContainer.appendChild(itemCard);
         });
       }
 
-      // Add item to cart using your API endpoint
+      // Add item to cart
       async function addToCart(menuItemId, button) {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/save/${menuItemId}`, {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/cart/user/save/${menuItemId}`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             if (cart.cartItem && Array.isArray(cart.cartItem)) {
-              cart.cartItem.forEach(item => {
+              cart.cartItem.forEach((item) => {
                 if (item.menuItem.id === menuItemId) {
                   cartMap[menuItemId] = item.id;
                 }
@@ -367,21 +479,28 @@
             button.classList.add("bg-red-500", "hover:bg-red-600");
             updateCartBadge(cart);
           } else {
-            console.error("Failed to add item to cart");
+            console.error(
+              "Failed to add item to cart",
+              response.status,
+              await response.text()
+            );
           }
         } catch (error) {
           console.error("Error adding item to cart:", error);
         }
       }
 
-      // Remove item from cart using your DELETE endpoint
+      // Remove item from cart
       async function removeFromCart(menuItemId, button) {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`, {
-            method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             delete cartMap[menuItemId];
@@ -390,7 +509,11 @@
             button.classList.add("bg-blue-500", "hover:bg-blue-600");
             updateCartBadge(cart);
           } else {
-            console.error("Failed to remove item from cart");
+            console.error(
+              "Failed to remove item from cart",
+              response.status,
+              await response.text()
+            );
           }
         } catch (error) {
           console.error("Error removing item from cart:", error);
@@ -406,7 +529,7 @@
         }
       }
 
-      // Update the cart badge with total quantity from cart response
+      // Update the cart badge with total quantity
       function updateCartBadge(cart) {
         const cartButton = document.getElementById("cartButton");
         if (cartButton) {
@@ -422,13 +545,24 @@
       }
 
       // Search functionality
-      document.getElementById("searchInput").addEventListener("input", function () {
-        const query = this.value.trim().toLowerCase();
-        const filtered = allItems.filter((item) => item.name.toLowerCase().includes(query));
+      function searchItems() {
+        const query = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+        const filtered = allItems.filter((item) =>
+          item.name.toLowerCase().includes(query)
+        );
         displayMenuItems(filtered);
-      });
+      }
 
-      // Initialize when DOM content is loaded
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          searchItems();
+        });
+
+      // Initialize on DOM load
       document.addEventListener("DOMContentLoaded", () => {
         updateNavbar();
         fetchMenuItems();

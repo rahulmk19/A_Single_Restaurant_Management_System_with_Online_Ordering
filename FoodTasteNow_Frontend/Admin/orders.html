@@ -5,73 +5,163 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Order Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+    }
+    .fixed-screen {
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Visual cues for order status */
+    .canceled {
+      background-color: #f8d7da; /* red/pink for canceled orders */
+    }
+    .delivered {
+      background-color: #d4edda; /* green for delivered orders */
+    }
+  </style>
 </head>
-<body class="bg-gray-100">
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Order Management</h1>
+<body class="bg-gray-100 fixed-screen">
+  <!-- Navbar -->
+  <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <h2 class="text-3xl font-bold">Admin Dashboard</h2>
+    <div>
+      <span class="mr-4 text-lg">Welcome, Admin</span>
+      <button class="bg-red-500 px-4 py-2 rounded text-lg" onclick="logout()">Logout</button>
+    </div>
+  </div>
 
-    <!-- Button to fetch orders -->
-    <div class="mb-6">
-      <button 
-        onclick="getAllOrders()" 
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-      >
-        Get All Orders
-      </button>
+  <div class="flex h-full">
+    <!-- Sidebar -->
+    <div class="w-64 bg-blue-600 text-white h-full p-5">
+      <ul>
+        <li class="mb-6 text-lg">
+          <a href="./orders.html" class="hover:underline">📜 Orders</a>
+        </li>
+        <li class="mb-6 text-lg">
+          <a href="./menuItem.html" class="hover:underline">📦 Products</a>
+        </li>
+        <li class="mb-6 text-lg">
+          <a href="./adminUser.html" class="hover:underline">👥 Users</a>
+        </li>
+      </ul>
     </div>
 
-    <!-- Table to display orders -->
-    <table class="table-auto w-full mt-4 border">
-      <thead>
-        <tr class="bg-gray-200">
-          <th class="border px-4 py-2">Order ID</th>
-          <th class="border px-4 py-2">Customer Name</th>
-          <th class="border px-4 py-2">Contact</th>
-          <th class="border px-4 py-2">Total Amount</th>
-          <th class="border px-4 py-2">Total Quantity</th>
-          <th class="border px-4 py-2">Status</th>
-          <th class="border px-4 py-2">Created At</th>
-          <th class="border px-4 py-2">Order Items</th>
-        </tr>
-      </thead>
-      <tbody id="orderList">
-        <!-- Orders will be dynamically inserted here -->
-      </tbody>
-    </table>
+    <!-- Main Content Area -->
+    <div class="flex-1 p-5 overflow-auto">
+      <h1 class="text-2xl font-bold mb-4">Order Management</h1>
+
+      <!-- Search Panel -->
+      <div class="mb-4">
+        <div class="flex space-x-4 flex-wrap">
+          <div>
+            <input type="text" id="searchOrderId" placeholder="Search by Order ID" class="border p-2 rounded">
+            <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="findOrderByOrderId()">Search</button>
+          </div>
+          <div>
+            <input type="text" id="searchUserId" placeholder="Search by User ID" class="border p-2 rounded">
+            <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="findOrderByUserId()">Search</button>
+          </div>
+          <div>
+            <input type="text" id="searchItem" placeholder="Search by Item" class="border p-2 rounded">
+            <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="findByItem()">Search</button>
+          </div>
+          <!-- New Date Filter Inputs -->
+          <div>
+            <label for="fromDate" class="mr-2">From:</label>
+            <input type="date" id="fromDate" class="border p-2 rounded">
+          </div>
+          <div>
+            <label for="toDate" class="mr-2">To:</label>
+            <input type="date" id="toDate" class="border p-2 rounded">
+          </div>
+          <div>
+            <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="filterByDate()">Filter by Date</button>
+          </div>
+          <div>
+            <button class="bg-gray-500 text-white px-3 py-2 rounded" onclick="getAllOrders()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Table -->
+      <table class="table-auto w-full mt-4 border">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border px-4 py-2">Order ID</th>
+            <th class="border px-4 py-2">User ID</th>
+            <th class="border px-4 py-2">Customer Name</th>
+            <th class="border px-4 py-2">Contact</th>
+            <th class="border px-4 py-2">Total Amount</th>
+            <th class="border px-4 py-2">Total Quantity</th>
+            <th class="border px-4 py-2">Status</th>
+            <th class="border px-4 py-2">Created At</th>
+            <th class="border px-4 py-2">Order Items</th>
+          </tr>
+        </thead>
+        <tbody id="orderList">
+          <!-- Orders will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal for Viewing Order Items -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded p-4 w-96">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Order Items</h2>
+        <button onclick="closeModal()" class="text-red-500 text-2xl">&times;</button>
+      </div>
+      <div id="modalContent" class="max-h-64 overflow-y-auto">
+        <!-- Order items will be loaded here -->
+      </div>
+      <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onclick="closeModal()">Close</button>
+    </div>
   </div>
 
   <script>
-    // Base URL for admin order endpoints (adjust if needed)
-    const BASE_URL = 'http://localhost:8081/foodtastenow/orders/admin';
+    // Global variable to store all fetched orders for client-side filtering
+    let allOrders = [];
 
-    // 1. Check if user is logged in and retrieve the token
+    // Base URL configuration matching your backend endpoints.
+    const BASE_URL = 'http://localhost:8081/foodtastenow/orders';
+    const ADMIN_BASE_URL = `${BASE_URL}/admin`;
+    const COMMON_BASE_URL = `${BASE_URL}/common`;
+
+    // Check login token
     const loginData = JSON.parse(localStorage.getItem("loginData"));
     if (!loginData || !loginData.token) {
-      // No valid login data found, redirect to login
       window.location.href = "../Login/login.html";
     }
     const token = loginData.token;
 
+    // Status options (from your StatusEnum)
+    const statusOptions = ["RECEIVED", "PREPARING", "READY", "ON_THE_WAY", "DELIVERED", "CANCELED", "PENDING", "FAILED"];
+
+    // Automatically fetch orders on page load.
+    document.addEventListener("DOMContentLoaded", getAllOrders);
+
     /**
-     * Fetch all orders from the server
+     * Fetch all orders from the backend (using /admin/getAll) and sort them descending by orderId.
      */
     async function getAllOrders() {
       try {
-        const response = await fetch(`${BASE_URL}/getAll`, {
+        const response = await fetch(`${ADMIN_BASE_URL}/getAll`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Send JWT in header
+            'Authorization': `Bearer ${token}`
           }
         });
+        if (!response.ok) throw new Error(`Failed to fetch orders. Status: ${response.status}`);
+        let orders = await response.json();
 
-        // If response is not OK, throw an error to trigger the catch block
-        if (!response.ok) {
-          throw new Error(`Failed to fetch orders. Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        renderOrders(data);
+        orders.sort((a, b) => b.orderId - a.orderId);
+        allOrders = orders; // Store orders globally for filtering
+        renderOrders(orders);
       } catch (error) {
         console.error("Error fetching orders:", error);
         alert("Error fetching orders: " + error.message);
@@ -79,74 +169,218 @@
     }
 
     /**
-     * Render orders in the table
-     * @param {Array} orders - array of order objects
+     * Render the orders table.
+     * Highlights delivered orders (green) and canceled orders (red/pink).
      */
     function renderOrders(orders) {
-      const orderList = document.getElementById('orderList');
-
+      const orderList = document.getElementById("orderList");
       if (!Array.isArray(orders) || orders.length === 0) {
-        orderList.innerHTML = `
-          <tr>
-            <td colspan="8" class="border px-4 py-2 text-center">No orders found.</td>
-          </tr>
-        `;
+        orderList.innerHTML = `<tr>
+          <td colspan="9" class="border px-4 py-2 text-center">No orders found.</td>
+        </tr>`;
         return;
       }
-
-      orderList.innerHTML = orders.map(order => `
-        <tr>
+      orderList.innerHTML = orders.map(order => {
+        let rowClass = "";
+        if (order.status === "CANCELED") rowClass = "canceled";
+        else if (order.status === "DELIVERED") rowClass = "delivered";
+        return `<tr class="${rowClass}">
           <td class="border px-4 py-2">${order.orderId}</td>
+          <td class="border px-4 py-2">${order.userId || ''}</td>
           <td class="border px-4 py-2">${order.customerName}</td>
           <td class="border px-4 py-2">${order.contactNum}</td>
           <td class="border px-4 py-2">₹${order.totalAmount}</td>
           <td class="border px-4 py-2">${order.totalQuantity}</td>
-          <td class="border px-4 py-2">${order.status}</td>
+          <td class="border px-4 py-2">
+            <select class="border px-2 py-1" onchange="updateStatus(${order.orderId}, this.value)" ${order.status === "CANCELED" ? "disabled" : ""}>
+              ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+            </select>
+          </td>
           <td class="border px-4 py-2">${order.createdAt}</td>
           <td class="border px-4 py-2">
-            <button 
-              onclick="showOrderItems(${order.orderId})" 
-              class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition-colors"
-            >
+            <button onclick="showOrderItems(${order.orderId})" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition-colors">
               View Items
             </button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
     /**
-     * Fetch order details by ID and display items
-     * @param {number} orderId
+     * Update order status.
+     * If newStatus is "CANCELED", calls the /common/cancel/{id} endpoint.
+     * Otherwise, calls the /admin/update/{id}/{status} endpoint.
+     */
+    async function updateStatus(orderId, newStatus) {
+      if (newStatus === "CANCELED") {
+        try {
+          const response = await fetch(`${COMMON_BASE_URL}/cancel/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (!response.ok) throw new Error(`Failed to cancel order. Status: ${response.status}`);
+          const updatedOrder = await response.json();
+          console.log(`Order ${orderId} canceled successfully.`, updatedOrder);
+          getAllOrders();
+        } catch (error) {
+          console.error("Error canceling order:", error);
+          alert("Error canceling order: " + error.message);
+        }
+      } else {
+        try {
+          const response = await fetch(`${ADMIN_BASE_URL}/update/${orderId}/${newStatus}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(newStatus)
+          });
+          if (!response.ok) throw new Error(`Failed to update order status. Status: ${response.status}`);
+          const updatedOrder = await response.json();
+          console.log(`Order ${orderId} status updated to ${newStatus}.`, updatedOrder);
+          getAllOrders();
+        } catch (error) {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status: " + error.message);
+        }
+      }
+    }
+
+    /**
+     * Fetch order details using /admin/getById/{id} and display items in a modal.
      */
     async function showOrderItems(orderId) {
       try {
-        const response = await fetch(`${BASE_URL}/getById/${orderId}`, {
+        const response = await fetch(`${ADMIN_BASE_URL}/getById/${orderId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           }
         });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch order ${orderId}. Status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Failed to fetch order ${orderId}. Status: ${response.status}`);
         const order = await response.json();
-
-        // Format items for display (using a simple alert for demonstration)
-        const itemsText = order.items.map(item => `
-          Item: ${item.menuItemName}
-          Quantity: ${item.quantity}
-          Subtotal: ₹${item.subTotal}
-        `).join('\n\n');
-
-        alert(`Order Items for Order ID: ${orderId}\n\n${itemsText}`);
+        const modalContent = document.getElementById("modalContent");
+        modalContent.innerHTML = order.items.map(item => `
+          <div class="border p-2 rounded mb-2">
+            <p><strong>Item:</strong> ${item.menuItemName}</p>
+            <p><strong>Quantity:</strong> ${item.quantity}</p>
+            <p><strong>Subtotal:</strong> ₹${item.subTotal}</p>
+          </div>
+        `).join('');
+        openModal();
       } catch (error) {
         console.error("Error fetching order details:", error);
         alert("Error fetching order details: " + error.message);
       }
+    }
+
+    // --- Search Functions ---
+
+    async function findOrderByOrderId() {
+      const orderId = document.getElementById("searchOrderId").value.trim();
+      if (!orderId) {
+        alert("Please enter an Order ID");
+        return;
+      }
+      try {
+        const response = await fetch(`${ADMIN_BASE_URL}/getById/${orderId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error(`Order not found. Status: ${response.status}`);
+        const order = await response.json();
+        renderOrders([order]);
+      } catch (error) {
+        console.error("Error finding order by ID:", error);
+        alert("Error: " + error.message);
+      }
+    }
+
+    async function findOrderByUserId() {
+      const userId = document.getElementById("searchUserId").value.trim();
+      if (!userId) {
+        alert("Please enter a User ID");
+        return;
+      }
+      try {
+        const response = await fetch(`${ADMIN_BASE_URL}/allOrder/getById/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error(`No orders found for this user. Status: ${response.status}`);
+        const orders = await response.json();
+        renderOrders(orders);
+      } catch (error) {
+        console.error("Error finding orders by user ID:", error);
+        alert("Error: " + error.message);
+      }
+    }
+
+    async function findByItem() {
+      const item = document.getElementById("searchItem").value.trim();
+      if (!item) {
+        alert("Please enter an Item");
+        return;
+      }
+      try {
+        const response = await fetch(`${ADMIN_BASE_URL}/findByItem/${item}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error(`No orders found for the item. Status: ${response.status}`);
+        const orders = await response.json();
+        renderOrders(orders);
+      } catch (error) {
+        console.error("Error finding orders by item:", error);
+        alert("Error: " + error.message);
+      }
+    }
+
+    // Filter orders by date range using the global "allOrders" array
+    function filterByDate() {
+      const fromDateValue = document.getElementById("fromDate").value;
+      const toDateValue = document.getElementById("toDate").value;
+      if (!fromDateValue || !toDateValue) {
+        alert("Please enter both From and To dates.");
+        return;
+      }
+      const fromDate = new Date(fromDateValue);
+      const toDate = new Date(toDateValue);
+      // Adjust toDate to include the full day
+      toDate.setHours(23, 59, 59, 999);
+
+      const filteredOrders = allOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate >= fromDate && orderDate <= toDate;
+      });
+      renderOrders(filteredOrders);
+    }
+
+    function openModal() {
+      document.getElementById("modal").classList.remove("hidden");
+    }
+    function closeModal() {
+      document.getElementById("modal").classList.add("hidden");
+    }
+
+    function logout() {
+      localStorage.removeItem('jwtToken');
+      localStorage.removeItem("loginData");
+      window.location.href = "../User/login.html";
     }
   </script>
 </body>

@@ -53,6 +53,7 @@
   <script>
     function logout() {
       localStorage.removeItem('loginData');
+      localStorage.removeItem('jwtToken');
       window.location.href = "../User/login.html";
     }
   </script>
