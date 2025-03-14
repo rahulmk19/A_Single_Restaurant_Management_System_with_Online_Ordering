@@ -32,7 +32,7 @@
             <a href="./menuItem.html" class="hover:underline">📦 Products</a>
           </li>
           <li class="mb-6 text-lg">
-            <a href="./userManagement.html" class="hover:underline">👥 Users</a>
+            <a href="./adminUser.html" class="hover:underline">👥 Users</a>
           </li>
         </ul>
       </div>
@@ -93,8 +93,8 @@
               <th class="border px-4 py-2">Email</th>
               <th class="border px-4 py-2">Mobile Number</th>
               <th class="border px-4 py-2">Role</th>
-              <th class="border px-4 py-2">Status</th>
-              <th class="border px-4 py-2">Delete User</th>
+              <th class="border px-4 py-2">Current Status</th>
+              <th class="border px-4 py-2">Block User</th>
             </tr>
           </thead>
           <tbody id="userList">
@@ -177,7 +177,7 @@
             <td class="border px-4 py-2">${user.active ? "Active" : "Inactive"}</td>
             <td class="border px-4 py-2">
               <button onclick="confirmDeleteUser(${user.id})" class="bg-red-500 text-white px-2 py-1 rounded">
-                Delete
+                De-Activate
               </button>
             </td>
           </tr>
@@ -187,47 +187,51 @@
       }
 
       // Function to handle role change confirmation
-      function confirmChangeRole(selectElement, userId) {
-        const newRole = selectElement.value;
-        const oldRole = selectElement.getAttribute("data-old-role");
-        if (confirm("Are you sure you want to change the role of this user?")) {
-          changeRole(userId, newRole, selectElement);
-        } else {
-          // Revert to the original role if canceled
-          selectElement.value = oldRole;
-        }
-      }
+function confirmChangeRole(selectElement, userId) {
+    const newRole = selectElement.value; // Get new role from dropdown
+    const oldRole = selectElement.getAttribute("data-old-role"); // Store old role for reverting if needed
 
-      // Function to perform role change API call
-      function changeRole(userId, newRole, selectElement) {
-        const user = { role: newRole };
-        fetch(`${ADMIN_BASE_URL}/update/${userId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(user),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to update role");
+    if (confirm(`Are you sure you want to change the user's role to ${newRole}?`)) {
+        changeRole(userId, newRole, selectElement);
+    } else {
+        // Revert to the original role if the user cancels
+        selectElement.value = oldRole;
+    }
+}
+
+// Function to change the role of a user
+async function changeRole(userId, newRole, selectElement) {
+    const token = localStorage.getItem("jwtToken"); // Retrieve JWT token
+    if (!token) {
+        alert("Unauthorized access. Please log in again.");
+        window.location.href = "../User/login.html";
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8081/foodtastenow/users/admin/changeRole?userId=${userId}&roleName=${encodeURIComponent(newRole)}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             }
-            return response.json();
-          })
-          .then(() => {
-            alert("Role updated successfully");
-            // Update the data-old-role attribute to the new role
-            selectElement.setAttribute("data-old-role", newRole);
-            getAllUsers();
-          })
-          .catch((error) => {
-            console.error("Error updating role:", error);
-            alert("Error updating role: " + error.message);
-            // Revert selection if an error occurs
-            selectElement.value = selectElement.getAttribute("data-old-role");
-          });
-      }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update role. Status: ${response.status}`);
+        }
+
+        const updatedUser = await response.json();
+        alert(`User role updated successfully to ${updatedUser.role.roleName}`);
+        selectElement.setAttribute("data-old-role", newRole); // Update old role after successful change
+
+    } catch (error) {
+        console.error("Error updating user role:", error);
+        alert(`Error updating role: ${error.message}`);
+        selectElement.value = selectElement.getAttribute("data-old-role"); // Revert selection on error
+    }
+}
+
 
       // Function to handle delete user confirmation
       function confirmDeleteUser(userId) {

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add / Update Product</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+    }
+    .fixed-screen {
+      height: 100vh;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 fixed-screen">
+  <!-- Navbar -->
+  <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <h2 class="text-3xl font-bold">Admin Dashboard</h2>
+    <div>
+      <span class="mr-4 text-lg">Welcome, Admin</span>
+      <button class="bg-green-500 px-4 py-2 rounded text-lg mr-2" onclick="goToProfile()">Profile</button>
+      <button class="bg-red-500 px-4 py-2 rounded text-lg" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="flex h-full">
+    <!-- Sidebar -->
+    <div class="w-64 bg-blue-600 text-white h-full p-5">
+      <ul>
+        <li class="mb-6 text-lg">
+          <a href="./orders.html" class="hover:underline">📜 Orders</a>
+        </li>
+        <li class="mb-6 text-lg">
+          <a href="./menuItem.html" class="hover:underline">📦 Products</a>
+        </li>
+        <li class="mb-6 text-lg">
+          <a href="./adminUser.html" class="hover:underline">👥 Users</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-5 overflow-auto">
+      <!-- Back Button -->
+      <div class="mb-4">
+        <button onclick="window.location.href='menuItem.html'" class="bg-gray-500 text-white px-3 py-2 rounded">
+          Back
+        </button>
+      </div>
+      <!-- Dynamic Form Heading -->
+      <h1 id="formHeading" class="text-2xl font-bold mb-4">Add Product</h1>
+      
+      <!-- Product Form -->
+      <form id="productForm" class="space-y-4">
+        <div>
+          <label for="name" class="block text-lg font-medium mb-1">Product Name</label>
+          <input type="text" id="name" class="w-full border p-2 rounded" required>
+        </div>
+        <div>
+          <label for="price" class="block text-lg font-medium mb-1">Price</label>
+          <input type="number" step="0.01" id="price" class="w-full border p-2 rounded" required>
+        </div>
+        <div>
+          <label for="quantity" class="block text-lg font-medium mb-1">Quantity</label>
+          <input type="number" id="quantity" class="w-full border p-2 rounded" required>
+        </div>
+        <div>
+          <label for="category" class="block text-lg font-medium mb-1">Category</label>
+          <select id="category" class="w-full border p-2 rounded" required>
+            <option value="">Select Category</option>
+            <option value="DESSERT">DESSERT</option>
+            <option value="NORTH_INDIAN">NORTH_INDIAN</option>
+            <option value="SOUTH_INDIAN">SOUTH_INDIAN</option>
+            <option value="CAKES">CAKES</option>
+            <option value="FAST_FOOD">FAST_FOOD</option>
+            <option value="STREET_FOOD">STREET_FOOD</option>
+            <option value="HEALTHY_DIET_FOOD">HEALTHY_DIET_FOOD</option>
+            <option value="BEVERAGES">BEVERAGES</option>
+          </select>
+        </div>
+        <div>
+          <label for="imageUrl" class="block text-lg font-medium mb-1">Image URL</label>
+          <input type="text" id="imageUrl" class="w-full border p-2 rounded" required>
+        </div>
+        <div>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Check for login token
+    const loginData = JSON.parse(localStorage.getItem("loginData"));
+    if (!loginData || !loginData.token) {
+      window.location.href = "../Login/login.html";
+    }
+    const token = loginData.token;
+    // Base URL for admin product endpoints
+    const ADMIN_BASE_URL = 'http://localhost:8081/foodtastenow/items/admin';
+
+    // Get the "id" query parameter (if exists)
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    const formHeading = document.getElementById('formHeading');
+    const productForm = document.getElementById('productForm');
+
+    // If productId exists, we are in update mode.
+    if (productId) {
+      formHeading.textContent = "Update Product";
+      // Fetch product details to pre-fill the form.
+      fetch(`${ADMIN_BASE_URL}/getById/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch product. Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(product => {
+        document.getElementById('name').value = product.name;
+        document.getElementById('price').value = product.price;
+        document.getElementById('quantity').value = product.quantity;
+        document.getElementById('category').value = product.category;
+        document.getElementById('imageUrl').value = product.imageUrl;
+      })
+      .catch(error => {
+        console.error("Error fetching product:", error);
+        alert("Error fetching product details: " + error.message);
+      });
+    } else {
+      formHeading.textContent = "Add Product";
+    }
+
+    // Form submission handler (for both add and update)
+    productForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const product = {
+        name: document.getElementById('name').value,
+        price: document.getElementById('price').value,
+        quantity: document.getElementById('quantity').value,
+        category: document.getElementById('category').value,
+        imageUrl: document.getElementById('imageUrl').value
+      };
+
+      let requestUrl = `${ADMIN_BASE_URL}/save`;
+      let method = 'POST';
+
+      if (productId) {
+        requestUrl = `${ADMIN_BASE_URL}/update/${productId}`;
+        method = 'PUT';
+      }
+
+      fetch(requestUrl, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(product)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to ${productId ? 'update' : 'add'} product. Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert(`Product ${productId ? 'updated' : 'added'} successfully!`);
+        window.location.href = 'menuItem.html';
+      })
+      .catch(error => {
+        console.error("Error submitting product:", error);
+        alert("Error: " + error.message);
+      });
+    });
+
+    function goToProfile() {
+      window.location.href = "profile.html";
+    }
+
+    function logout() {
+      localStorage.removeItem('jwtToken');
+      localStorage.removeItem("loginData");
+      window.location.href = "../User/login.html";
+    }
+  </script>
+</body>
+</html>
