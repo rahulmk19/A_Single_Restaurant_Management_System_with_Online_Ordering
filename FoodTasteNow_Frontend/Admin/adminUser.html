@@ -12,7 +12,10 @@
       <h2 class="text-3xl font-bold">Admin Dashboard</h2>
       <div>
         <span id="welcomeMsg" class="mr-4 text-lg"></span>
-        <button onclick="profile()" class="bg-blue-500 px-4 py-2 rounded text-lg">
+        <button
+          onclick="profile()"
+          class="bg-green-500 px-4 py-2 rounded text-lg"
+        >
           Profile
         </button>
         <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded text-lg">
@@ -128,7 +131,9 @@
 
       // Set welcome message using username from authentication
       document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("welcomeMsg").textContent = `Welcome, ${loginData.username}`;
+        document.getElementById(
+          "welcomeMsg"
+        ).textContent = `Welcome, ${loginData.username}`;
         getAllUsers();
       });
 
@@ -140,14 +145,25 @@
             Authorization: `Bearer ${token}`,
           },
         })
-          .then((response) => response.json())
+          .then(async (response) => {
+            if (response.status === 401) {
+              throw new Error(
+                "Unauthorized access. Please contact with our admin support."
+              );
+            }
+            const text = await response.text();
+            if (!text) {
+              throw new Error("Unauthorized access.");
+            }
+            return JSON.parse(text);
+          })
           .then((data) => {
             allUsers = data;
             renderUsers(allUsers);
           })
           .catch((error) => {
             console.error("Error fetching users:", error);
-            alert("Error fetching users: " + error.message);
+            alert(error.message);
           });
       }
 
@@ -169,14 +185,26 @@
             <td class="border px-4 py-2">${user.email}</td>
             <td class="border px-4 py-2">${user.mobileNumber || ""}</td>
             <td class="border px-4 py-2">
-              <select data-old-role="${user.roles}" onchange="confirmChangeRole(this, ${user.id})" class="border p-2 rounded">
-                <option value="USER" ${user.roles === "USER" ? "selected" : ""}>USER</option>
-                <option value="ADMIN" ${user.roles === "ADMIN" ? "selected" : ""}>ADMIN</option>
+              <select data-old-role="${
+                user.roles
+              }" onchange="confirmChangeRole(this, ${
+              user.id
+            })" class="border p-2 rounded">
+                <option value="USER" ${
+                  user.roles === "USER" ? "selected" : ""
+                }>USER</option>
+                <option value="ADMIN" ${
+                  user.roles === "ADMIN" ? "selected" : ""
+                }>ADMIN</option>
               </select>
             </td>
-            <td class="border px-4 py-2">${user.active ? "Active" : "Inactive"}</td>
+            <td class="border px-4 py-2">${
+              user.active ? "Active" : "Inactive"
+            }</td>
             <td class="border px-4 py-2">
-              <button onclick="confirmDeleteUser(${user.id})" class="bg-red-500 text-white px-2 py-1 rounded">
+              <button onclick="confirmDeleteUser(${
+                user.id
+              })" class="bg-red-500 text-white px-2 py-1 rounded">
                 De-Activate
               </button>
             </td>
@@ -187,51 +215,60 @@
       }
 
       // Function to handle role change confirmation
-function confirmChangeRole(selectElement, userId) {
-    const newRole = selectElement.value; // Get new role from dropdown
-    const oldRole = selectElement.getAttribute("data-old-role"); // Store old role for reverting if needed
+      function confirmChangeRole(selectElement, userId) {
+        const newRole = selectElement.value; // Get new role from dropdown
+        const oldRole = selectElement.getAttribute("data-old-role"); // Store old role for reverting if needed
 
-    if (confirm(`Are you sure you want to change the user's role to ${newRole}?`)) {
-        changeRole(userId, newRole, selectElement);
-    } else {
-        // Revert to the original role if the user cancels
-        selectElement.value = oldRole;
-    }
-}
+        if (
+          confirm(
+            `Are you sure you want to change the user's role to ${newRole}?`
+          )
+        ) {
+          changeRole(userId, newRole, selectElement);
+        } else {
+          // Revert to the original role if the user cancels
+          selectElement.value = oldRole;
+        }
+      }
 
-// Function to change the role of a user
-async function changeRole(userId, newRole, selectElement) {
-    const token = localStorage.getItem("jwtToken"); // Retrieve JWT token
-    if (!token) {
-        alert("Unauthorized access. Please log in again.");
-        window.location.href = "../User/login.html";
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:8081/foodtastenow/users/admin/changeRole?userId=${userId}&roleName=${encodeURIComponent(newRole)}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to update role. Status: ${response.status}`);
+      // Function to change the role of a user
+      async function changeRole(userId, newRole, selectElement) {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          alert("Unauthorized access. Please log in again.");
+          window.location.href = "../User/login.html";
+          return;
         }
 
-        const updatedUser = await response.json();
-        alert(`User role updated successfully to ${updatedUser.role.roleName}`);
-        selectElement.setAttribute("data-old-role", newRole); // Update old role after successful change
+        try {
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/users/admin/changeRole?userId=${userId}&roleName=${encodeURIComponent(
+              newRole
+            )}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-    } catch (error) {
-        console.error("Error updating user role:", error);
-        alert(`Error updating role: ${error.message}`);
-        selectElement.value = selectElement.getAttribute("data-old-role"); // Revert selection on error
-    }
-}
+          if (!response.ok) {
+            throw new Error(
+              `Failed to update role. Status: ${response.status}`
+            );
+          }
 
+          const updatedUser = await response.json();
+          alert("User role updated successfully");
+          selectElement.setAttribute("data-old-role", newRole);
+        } catch (error) {
+          console.error("Error updating user role:", error);
+          alert(`Error updating role: ${error.message}`);
+          selectElement.value = selectElement.getAttribute("data-old-role");
+        }
+      }
 
       // Function to handle delete user confirmation
       function confirmDeleteUser(userId) {
@@ -296,8 +333,7 @@ async function changeRole(userId, newRole, selectElement) {
       }
 
       function profile() {
-        // Redirect to the profile page (adjust the URL as needed)
-        window.location.href = "../User/profile.html";
+        window.location.href = "userProfile.html";
       }
     </script>
   </body>

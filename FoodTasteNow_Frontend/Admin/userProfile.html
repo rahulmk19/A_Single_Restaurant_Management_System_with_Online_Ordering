@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - FoodTasteNow</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Dropdown styling for nav bar */
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        z-index: 50;
+      }
+      .dropdown-menu a {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #333;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+      .dropdown-menu a:hover {
+        background-color: #f1f1f1;
+      }
+      .open .dropdown-menu {
+        display: block;
+      }
+      /* Layout for admin view with sidebar */
+      .admin-container {
+        display: flex;
+        min-height: calc(100vh - 80px); /* minus nav bar height */
+      }
+      .sidebar {
+        width: 250px;
+        background-color: #2563eb;
+        color: white;
+        padding: 20px;
+      }
+      .main-content {
+        flex: 1;
+        padding: 20px;
+      }
+      body {
+        padding-top: 80px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <!-- The navbar will be inserted here -->
+    <div id="navbarContainer"></div>
+    
+    <!-- For admin users, include a left sidebar -->
+    <div id="pageContainer"></div>
+
+    <script>
+      // Retrieve login data from localStorage
+      const loginData = JSON.parse(localStorage.getItem("loginData"));
+      if (!loginData || !loginData.token) {
+        window.location.href = "../User/login.html";
+      }
+      
+      // Check role (support both array and string formats)
+      let isAdmin = false;
+      if (Array.isArray(loginData.roles)) {
+        isAdmin = loginData.roles.includes("ROLE_ADMIN") || loginData.roles.includes("ADMIN");
+      } else {
+        isAdmin = (loginData.roles === "ADMIN" || loginData.roles === "ROLE_ADMIN");
+      }
+      
+      // Build the navigation bar
+      let navbarHTML = "";
+      if (isAdmin) {
+        // Admin nav bar (with left sidebar to be added later)
+        navbarHTML = `
+          <div class="bg-blue-600 text-white p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50">
+            <h2 class="text-3xl font-bold">Admin Dashboard</h2>
+            <div>
+              <span id="welcomeMsg" class="mr-4 text-lg">Welcome, ${loginData.username || 'Admin'}</span>
+              <button class="bg-green-500 px-4 py-2 rounded text-lg mr-2" onclick="goToProfile()">Profile</button>
+              <button class="bg-red-500 px-4 py-2 rounded text-lg" onclick="logout()">Logout</button>
+            </div>
+          </div>
+        `;
+      } else {
+        // Default (user) nav bar
+        navbarHTML = `
+          <nav class="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg z-50">
+            <div class="container mx-auto flex justify-between items-center">
+              <div class="flex items-center space-x-6">
+                <div class="logo">
+                  <a href="../index.html" class="text-white font-extrabold text-3xl tracking-wide">FoodTasteNow</a>
+                </div>
+                <div class="nav-links hidden md:flex space-x-4" id="navLinks">
+                  <a href="../index.html" class="text-white hover:text-gray-200">Home</a>
+                  <a href="../category.html" class="text-white hover:text-gray-200">Category</a>
+                </div>
+              </div>
+              <div class="flex items-center space-x-4">
+                <div class="search-bar hidden md:flex">
+                  <input type="text" placeholder="Search products..." id="searchInput" class="px-3 py-2 rounded-l-lg border focus:outline-none" />
+                  <button onclick="searchItems()" class="px-4 py-2 bg-white text-red-500 rounded-r-lg hover:bg-red-100">Search</button>
+                </div>
+                <div class="auth" id="authSection">
+                  <span class="text-white">Welcome, ${loginData.username || 'User'}</span>
+                </div>
+                <button class="md:hidden text-white focus:outline-none" onclick="toggleMobileMenu()">
+                  <i class="fas fa-bars text-2xl"></i>
+                </button>
+              </div>
+            </div>
+          </nav>
+        `;
+      }
+      document.getElementById("navbarContainer").innerHTML = navbarHTML;
+      
+      // Build the page container. For admin users, include a left sidebar.
+      let pageContainerHTML = "";
+      if (isAdmin) {
+        pageContainerHTML = `
+          <div class="admin-container">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+              <ul>
+                <li class="mb-6 text-lg">
+                  <a href="./orders.html" class="hover:underline">📜 Orders</a>
+                </li>
+                <li class="mb-6 text-lg font-bold">
+                  <a href="./menuItem.html" class="hover:underline">📦 Products</a>
+                </li>
+                <li class="mb-6 text-lg">
+                  <a href="./adminUser.html" class="hover:underline">👥 Users</a>
+                </li>
+              </ul>
+            </div>
+            <!-- Main Content Area -->
+            <div class="main-content">
+              ${getProfileContent()}
+            </div>
+          </div>
+        `;
+      } else {
+        // For non-admin, display the profile content without sidebar.
+        pageContainerHTML = `
+          <div class="container mx-auto p-6">
+            ${getProfileContent()}
+          </div>
+        `;
+      }
+      document.getElementById("pageContainer").innerHTML = pageContainerHTML;
+      
+      // Function to return the profile content HTML
+      function getProfileContent() {
+        return `
+          <h1 class="text-2xl font-bold mb-6 text-gray-800">My Profile</h1>
+          <!-- Personal Information Section -->
+          <div class="mb-6 pb-4 border-b border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold text-gray-700">Personal Information</h2>
+              <button onclick="enableEdit('username')" class="text-blue-600 hover:text-blue-800 text-sm">
+                <i class="fas fa-edit mr-1"></i>Edit
+              </button>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Name</label>
+                <input id="name" type="text" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Username</label>
+                <input id="username" type="text" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+              </div>
+            </div>
+          </div>
+          <!-- Contact Information Section -->
+          <div class="mb-6 pb-4 border-b border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold text-gray-700">Contact Information</h2>
+              <button onclick="enableEdit('email')" class="text-blue-600 hover:text-blue-800 text-sm">
+                <i class="fas fa-edit mr-1"></i>Edit
+              </button>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                <input id="email" type="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Mobile Number</label>
+                <input id="mobile" type="tel" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled pattern="[0-9]{10}" title="10-digit mobile number">
+              </div>
+            </div>
+          </div>
+          <!-- Save Button -->
+          <button id="saveButton" onclick="updateProfile()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Save Changes
+          </button>
+        `;
+      }
+      
+      // Profile editing functions
+      let originalValues = {};
+      function enableEdit(fieldId) {
+        const field = document.getElementById(fieldId);
+        field.disabled = false;
+        field.focus();
+        originalValues[fieldId] = field.value;
+        if (fieldId === 'mobile') {
+          field.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+          });
+        }
+        field.addEventListener('input', checkForChanges);
+        checkForChanges();
+      }
+      function checkForChanges() {
+        const saveButton = document.getElementById("saveButton");
+        const hasChanges = Object.keys(originalValues).some(key => document.getElementById(key).value !== originalValues[key]);
+        saveButton.disabled = !hasChanges;
+      }
+      async function updateProfile() {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          alert("Session expired. Please login again.");
+          window.location.href = "../User/login.html";
+          return;
+        }
+        const updatedData = {
+          name: document.getElementById("name").value.trim(),
+          username: document.getElementById("username").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          mobileNumber: document.getElementById("mobile").value.trim()
+        };
+        try {
+          const response = await fetch("http://localhost:8081/foodtastenow/common/profile/update", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedData)
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Update failed");
+          }
+          const updatedProfile = await response.json();
+          alert("Profile updated successfully!");
+          document.querySelectorAll("input").forEach(input => {
+            input.disabled = true;
+            originalValues[input.id] = input.value;
+          });
+          document.getElementById("saveButton").disabled = true;
+        } catch (error) {
+          console.error("Update error:", error);
+          alert(`Update failed: ${error.message}`);
+        }
+      }
+      
+      // Initialize profile data
+      document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          window.location.href = "../User/login.html";
+          return;
+        }
+        try {
+          const response = await fetch("http://localhost:8081/foodtastenow/users/common/profile", {
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (!response.ok) {
+            throw new Error("Failed to load profile");
+          }
+          const profile = await response.json();
+          document.getElementById("name").value = profile.name || "";
+          document.getElementById("username").value = profile.username || "";
+          document.getElementById("email").value = profile.email || "";
+          document.getElementById("mobile").value = profile.mobileNumber || "";
+          originalValues = {
+            name: profile.name || "",
+            username: profile.username || "",
+            email: profile.email || "",
+            mobile: profile.mobileNumber || ""
+          };
+        } catch (error) {
+          console.error("Profile load error:", error);
+          alert("Failed to load profile data");
+        }
+      });
+      
+      // Additional nav bar functions for default user nav
+      function toggleMobileMenu() {
+        const mobileMenu = document.getElementById("mobileMenu");
+        mobileMenu.classList.toggle("hidden");
+      }
+      function searchItems() {
+        // Implement search functionality if needed.
+      }
+      // Logout function
+      function logout() {
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("loginData");
+        window.location.href = "../User/login.html";
+      }
+    </script>
+  </body>
+</html>

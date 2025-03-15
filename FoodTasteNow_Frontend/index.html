@@ -281,7 +281,7 @@
 
           // If there's at least one authority, return it
           if (payload.authorities && payload.authorities.length > 0) {
-            return payload.authorities[0].authority; // e.g. "ROLE_USER" or "ROLE_ADMIN"
+            return payload.authorities[0].authority;
           } else {
             return null;
           }
@@ -323,7 +323,7 @@
                 <i class="fas fa-caret-down ml-1"></i>
               </button>
               <div id="userDropdown" class="dropdown-menu">
-                <a href="profile.html">My Profile</a>
+                <a href="Admin/userProfile.html">My Profile</a>
                 <a href="Orders/allOrders.html">Orders</a>
                 <a href="coupons.html">Coupon</a>
                 <a href="notifications.html">Notifications</a>
@@ -567,6 +567,7 @@
         updateNavbar();
         fetchMenuItems();
       });
+
     </script>
   </body>
 </html>
