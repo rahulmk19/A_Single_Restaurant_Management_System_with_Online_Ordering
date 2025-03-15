@@ -46,17 +46,17 @@ public class WebSecurityConfiguration {
             .cors().and()
             .authorizeHttpRequests(authorize -> authorize
                 // Admin endpoints
-                .requestMatchers(SecurityConstants.menuItem, "foodtastenow/orders/admin/**")
-                    .hasRole("Admin")
+                .requestMatchers(SecurityConstants.menuItem,SecurityConstants.admin_user, "foodtastenow/orders/admin/**","foodtastenow/orders/admin/getAll")
+                    .hasRole("ADMIN")
                 // Endpoints common to both Admin and User roles
-                .requestMatchers("foodtastenow/orders/common/**","foodtastenow/cart/user")
-                    .hasAnyRole("Admin", "User")
+                .requestMatchers("foodtastenow/orders/common/**","foodtastenow/cart/user",SecurityConstants.common_user,SecurityConstants.common_Profile)
+                    .hasAnyRole("ADMIN", "USER")
                 // User endpoints
                 .requestMatchers(SecurityConstants.userDetails,
                                  "foodtastenow/orders/**",
                                  "foodtastenow/orders/user/getalluserorders",
                                  SecurityConstants.cart)
-                    .hasRole("User")
+                    .hasRole("USER")
                 // Public endpoints
                 .requestMatchers(SecurityConstants.public_Auth, SecurityConstants.public_Item)
                     .permitAll()

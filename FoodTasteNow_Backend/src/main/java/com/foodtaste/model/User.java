@@ -1,7 +1,5 @@
 package com.foodtaste.model;
 
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -12,8 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -47,14 +44,13 @@ public class User {
 	@Size(min = 8, message = "Password must be at least 8 characters long")
 	private String password;
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "USER_ROLE", joinColumns = { @JoinColumn(name = "USER_ID") }, inverseJoinColumns = {
-			@JoinColumn(name = "ROLE_ID") })
-	private Set<Role> roles;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "role_id")
+	private Role role;
 
 	@JsonIgnore
 	@OneToOne(cascade = CascadeType.ALL)
 	private Cart cart;
 
-	private boolean deleted = false;
+	private boolean isActive = true;
 }

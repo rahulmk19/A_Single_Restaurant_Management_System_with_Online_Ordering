@@ -12,4 +12,5 @@ public class LoginResponseDTO {
 	private String token;
 	private String username;
 	private String firstName;
+	private String roles;
 }

@@ -137,7 +137,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 		if (cart.getCartItem().isEmpty()) {
 			throw new CartException("Cannot checkout an empty cart");
-			
+
 		}
 
 		OrderDetail order = new OrderDetail();
@@ -150,7 +150,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		order.setContactNum(orderRequest.getContactNum());
 		order.setAlternateContactNum(orderRequest.getAlternateContactNum());
 		order.setCustomerAddress(orderRequest.getCustomerAddress());
-
 
 		List<OrderItem> orderItems = new ArrayList<>();
 		for (CartItem cartItem : cart.getCartItem()) {
@@ -238,5 +237,15 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 				.map(order -> modelMapper.map(order, OrderResponse.class)).toList();
 
 		return getAllOrderResponse;
+	}
+
+	@Override
+	public List<OrderResponse> getOrderByUserId(Long userId) {
+		User user = userRepo.findById(userId)
+				.orElseThrow(() -> new UserException("User is not found with id" + userId));
+		List<OrderDetail> allOrders = orderDetailRepo.findOrdersByUserId(userId);
+		List<OrderResponse> getAllOrderByUser = allOrders.stream()
+				.map(order -> modelMapper.map(order, OrderResponse.class)).toList();
+		return getAllOrderByUser;
 	}
 }

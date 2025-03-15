@@ -14,6 +14,8 @@ public interface OrderDetailService {
 
 	OrderResponse getOrderById(Integer orderId);
 
+	List<OrderResponse> getOrderByUserId(Long userId);
+
 	OrderDetail getOrderByIdWithItems(Integer orderId);
 
 	OrderResponse checkout(CheckoutOrderRequest orderRequest);

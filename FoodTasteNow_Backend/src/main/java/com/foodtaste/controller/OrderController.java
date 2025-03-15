@@ -46,10 +46,17 @@ public class OrderController {
 
 	}
 
-	@GetMapping(AppConstants.ADMIN + AppConstants.GET_BY_ID + "/{id}")
-	public ResponseEntity<OrderResponse> getOrderDetailsById(@PathVariable Integer id) {
-		log.info("Received request to fetch order details with ID: {}", id);
-		OrderResponse response = orderDetailService.getOrderById(id);
+	@GetMapping(AppConstants.ADMIN + AppConstants.GET_BY_ID + "/{orderId}")
+	public ResponseEntity<OrderResponse> getOrderDetailsById(@PathVariable Integer orderId) {
+		log.info("Received request to fetch order details with ID: {}", orderId);
+		OrderResponse response = orderDetailService.getOrderById(orderId);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping(AppConstants.ADMIN + "/allOrder" + AppConstants.GET_BY_ID + "/{userId}")
+	public ResponseEntity<List<OrderResponse>> getOrderDetailsByUserId(@PathVariable Long userId) {
+		log.info("Received request to fetch order details with ID: {}", userId);
+		List<OrderResponse> response = orderDetailService.getOrderByUserId(userId);
 		return ResponseEntity.ok(response);
 	}
 

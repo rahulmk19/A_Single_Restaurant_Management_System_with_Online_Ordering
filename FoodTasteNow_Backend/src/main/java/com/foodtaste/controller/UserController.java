@@ -8,13 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.foodtaste.constant.AppConstants;
+import com.foodtaste.dto.Profile;
 import com.foodtaste.dto.UserRequestDTO;
 import com.foodtaste.dto.UserResponseDTO;
 import com.foodtaste.service.UserService;
@@ -24,7 +27,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping()
+@RequestMapping(AppConstants.APP_NAME + "/users")
 @CrossOrigin(origins = "*")
 @Slf4j
 public class UserController {
@@ -36,9 +39,8 @@ public class UserController {
 	public void initRoleAndUsers() {
 		userService.initRoleAndUsers();
 	}
-	
 
-	@PutMapping(AppConstants.UPDATE + "/{id}")
+	@PutMapping(AppConstants.USER + AppConstants.UPDATE + "/{id}")
 	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable("id") Long userId,
 			@Valid @RequestBody UserRequestDTO userRequestDTO) {
 		log.info("Received request to update user with ID: {}", userId);
@@ -47,7 +49,22 @@ public class UserController {
 		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 	}
 
-	@GetMapping(AppConstants.GET_ALL)
+	@GetMapping(AppConstants.COMMON + "/profile")
+	public ResponseEntity<Profile> getProfile() {
+		log.info("Received request to fetch Profile of users");
+
+		Profile profile = userService.getUserProfile();
+		return ResponseEntity.ok(profile);
+	}
+
+	@PatchMapping(AppConstants.ADMIN + "/changeRole")
+	public ResponseEntity<UserResponseDTO> changeUserRole(@RequestParam Long userId, @RequestParam String roleName) {
+		log.info("Changing role of user {} to {}", userId, roleName);
+		UserResponseDTO updatedUser = userService.convertUserToAdmin(userId, roleName);
+		return ResponseEntity.ok(updatedUser);
+	}
+
+	@GetMapping(AppConstants.ADMIN + AppConstants.GET_ALL)
 	public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
 		log.info("Received request to fetch all users");
 
@@ -55,7 +72,7 @@ public class UserController {
 		return ResponseEntity.ok(users);
 	}
 
-	@GetMapping(AppConstants.GET_BY_ID + "/{id}")
+	@GetMapping(AppConstants.ADMIN + AppConstants.GET_BY_ID + "/{id}")
 	public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
 		log.info("Received request to fetch user with ID: {}", userId);
 
@@ -63,7 +80,7 @@ public class UserController {
 		return ResponseEntity.ok(user);
 	}
 
-	@DeleteMapping(AppConstants.DELETE + "/{id}")
+	@DeleteMapping(AppConstants.ADMIN + AppConstants.DELETE + "/{id}")
 	public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
 		log.info("Received request to delete user with ID: {}", userId);
 

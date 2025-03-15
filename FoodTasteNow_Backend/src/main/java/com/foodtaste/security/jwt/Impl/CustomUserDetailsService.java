@@ -1,7 +1,6 @@
 package com.foodtaste.security.jwt.Impl;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.foodtaste.model.User;
 import com.foodtaste.repository.UserRepo;
-
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -31,23 +29,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if (loginAttribute.matches("^[a-zA-Z][a-zA-Z0-9]*$")) {
 			user = userRepo.findByUsername(loginAttribute).orElseThrow(
 					() -> new UsernameNotFoundException("User not found with username: " + loginAttribute));
-		}
-		else if (loginAttribute.matches("\\d{10}")) {
+		} else if (loginAttribute.matches("\\d{10}")) {
 			user = userRepo.findByMobileNumber(loginAttribute).orElseThrow(
 					() -> new UsernameNotFoundException("User not found with mobile number: " + loginAttribute));
-		} 
-		else if (loginAttribute.contains("@")) {
+		} else if (loginAttribute.contains("@")) {
 			user = userRepo.findByEmail(loginAttribute)
 					.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginAttribute));
-		}
-		else {
+		} else {
 			throw new UsernameNotFoundException("Invalid username format");
 		}
 
-		Set<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName())).collect(Collectors.toSet());
+		GrantedAuthority authorities = new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName());
 
-		return new CustomUserDetails(loginAttribute, user.getPassword(), authorities);
+		return new CustomUserDetails(loginAttribute, user.getPassword(), Collections.singleton(authorities));
 	}
 
 }

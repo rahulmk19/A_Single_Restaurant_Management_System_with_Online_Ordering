@@ -16,5 +16,6 @@ public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
 
 	@Query(value = "SELECT * FROM order_detail WHERE user_id = :userId", nativeQuery = true)
 	List<OrderDetail> findOrdersByUserId(@Param("userId") Long userId);
+	
 
 }

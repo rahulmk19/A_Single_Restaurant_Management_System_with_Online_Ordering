@@ -1,16 +1,17 @@
 package com.foodtaste.serviceImpl;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.foodtaste.dto.Profile;
 import com.foodtaste.dto.UserRequestDTO;
 import com.foodtaste.dto.UserResponseDTO;
 import com.foodtaste.exception.UserException;
@@ -52,15 +53,10 @@ public class UserServiceImpl implements UserService {
 			adminUser.setPassword(passwordEncoder.encode("Admin@123"));
 			adminUser.setMobileNumber("7667869850");
 
-			Set<Role> adminRoles = new HashSet<>();
+			Role adminRole = roleRepo.findByRoleName("Admin")
+					.orElseThrow(() -> new RuntimeException("AdminRole not found"));
 
-			Role adminRole = new Role();
-			adminRole.setRoleName("Admin");
-			adminRole.setRoleDesc("Admin Role");
-			roleRepo.save(adminRole);
-
-			adminRoles.add(adminRole);
-			adminUser.setRoles(adminRoles);
+			adminUser.setRole(adminRole);
 			userRepo.save(adminUser);
 		}
 
@@ -95,17 +91,12 @@ public class UserServiceImpl implements UserService {
 		newUser.setMobileNumber(userRequestDTO.getMobileNumber());
 		newUser.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
 
-		Set<Role> userRole = new HashSet<>();
-		Role role = roleRepo.findByRoleName("User").orElseGet(() -> {
-			Role newRole = new Role();
-			newRole.setRoleName("User");
-			newRole.setRoleDesc("Default user role");
-			return roleRepo.save(newRole);
-		});
-		userRole.add(role);
-		newUser.setRoles(userRole);
+		Role role = roleRepo.findByRoleName("User")
+				.orElseThrow(() -> new RuntimeException("RoleName not found" + "User"));
+		newUser.setRole(role);
 
 		User savedUser = userRepo.save(newUser);
+		System.out.print(savedUser);
 		return modelMapper.map(savedUser, UserResponseDTO.class);
 	}
 
@@ -113,7 +104,12 @@ public class UserServiceImpl implements UserService {
 	public List<UserResponseDTO> getAllUsers() {
 		log.info("Fetching all users from the database");
 		List<User> allUsers = userRepo.findAll();
-		return allUsers.stream().map(user -> modelMapper.map(user, UserResponseDTO.class)).collect(Collectors.toList());
+
+		List<UserResponseDTO> userResponseDTO = allUsers.stream()
+				.map(user -> new UserResponseDTO(user.getId(), user.getUsername(), user.getName(), user.getEmail(),
+						user.getMobileNumber(), user.getRole().getRoleName(), user.isActive()))
+				.collect(Collectors.toList());
+		return userResponseDTO;
 	}
 
 	@Override
@@ -174,10 +170,40 @@ public class UserServiceImpl implements UserService {
 			log.warn("User not found with ID: {}", userId);
 			return new UserException("User not found with ID: " + userId);
 		});
-		user.setDeleted(true);
+		user.setActive(false);
 		userRepo.save(user);
 		log.info("User soft deleted successfully with ID: {}", userId);
 		return "User soft deleted successfully with ID " + userId;
+	}
+
+	@Override
+	public UserResponseDTO convertUserToAdmin(Long userId, String roleName) {
+		User user = userRepo.findById(userId).orElseThrow(() -> new UserException("User not found with ID: " + userId));
+
+		Role role = roleRepo.findByRoleName(roleName)
+				.orElseThrow(() -> new UserException("Role not found: " + roleName));
+
+		user.setRole(role);
+		User savedUser = userRepo.save(user);
+
+		return modelMapper.map(savedUser, UserResponseDTO.class);
+	}
+
+	@Override
+	public Profile getUserProfile() {
+		User user = getCurrentUser();
+		Profile profile = new Profile(user.getName(), user.getUsername(), user.getEmail(), user.getMobileNumber());
+		return profile;
+	}
+
+	private User getCurrentUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || !auth.isAuthenticated()) {
+			throw new UserException("User is not authenticated");
+		}
+		String username = auth.getName();
+		return userRepo.findByUsername(username)
+				.orElseThrow(() -> new UserException("User not found with username: " + username));
 	}
 
 }
