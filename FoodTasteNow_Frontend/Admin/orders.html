@@ -30,8 +30,15 @@
       <h2 class="text-3xl font-bold">Admin Dashboard</h2>
       <div class="flex items-center space-x-4">
         <span id="welcomeMsg" class="mr-4 text-lg">Welcome, Admin</span>
-        <button class="bg-green-500 px-4 py-2 rounded text-lg mr-2" onclick="goToProfile()">Profile</button>
-        <button class="bg-red-500 px-4 py-2 rounded text-lg" onclick="logout()">Logout</button>
+        <button
+          class="bg-green-500 px-4 py-2 rounded text-lg mr-2"
+          onclick="goToProfile()"
+        >
+          Profile
+        </button>
+        <button class="bg-red-500 px-4 py-2 rounded text-lg" onclick="logout()">
+          Logout
+        </button>
       </div>
     </div>
 
@@ -59,12 +66,32 @@
         <div class="mb-4">
           <div class="flex space-x-4 flex-wrap">
             <div>
-              <input type="text" id="searchOrderId" placeholder="Search by Order ID" class="border p-2 rounded" />
-              <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="findOrderByOrderId()">Search</button>
+              <input
+                type="text"
+                id="searchOrderId"
+                placeholder="Search by Order ID"
+                class="border p-2 rounded"
+              />
+              <button
+                class="bg-blue-500 text-white px-3 py-2 rounded"
+                onclick="findOrderByOrderId()"
+              >
+                Search
+              </button>
             </div>
             <div>
-              <input type="text" id="searchUserId" placeholder="Search by User ID" class="border p-2 rounded" />
-              <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="findOrderByUserId()">Search</button>
+              <input
+                type="text"
+                id="searchUserId"
+                placeholder="Search by User ID"
+                class="border p-2 rounded"
+              />
+              <button
+                class="bg-blue-500 text-white px-3 py-2 rounded"
+                onclick="findOrderByUserId()"
+              >
+                Search
+              </button>
             </div>
             <!-- Date Filter Inputs -->
             <div>
@@ -76,10 +103,20 @@
               <input type="date" id="toDate" class="border p-2 rounded" />
             </div>
             <div>
-              <button class="bg-blue-500 text-white px-3 py-2 rounded" onclick="filterByDate()">Filter by Date</button>
+              <button
+                class="bg-blue-500 text-white px-3 py-2 rounded"
+                onclick="filterByDate()"
+              >
+                Filter by Date
+              </button>
             </div>
             <div>
-              <button class="bg-gray-500 text-white px-3 py-2 rounded" onclick="getAllOrders()">Reset</button>
+              <button
+                onclick="resetFilters()"
+                class="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -107,16 +144,26 @@
     </div>
 
     <!-- Modal for Viewing Order Items -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div
+      id="modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+    >
       <div class="bg-white rounded p-4 w-96">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Order Items</h2>
-          <button onclick="closeModal()" class="text-red-500 text-2xl">&times;</button>
+          <button onclick="closeModal()" class="text-red-500 text-2xl">
+            &times;
+          </button>
         </div>
         <div id="modalContent" class="max-h-64 overflow-y-auto">
           <!-- Order items will be loaded here -->
         </div>
-        <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onclick="closeModal()">Close</button>
+        <button
+          class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          onclick="closeModal()"
+        >
+          Close
+        </button>
       </div>
     </div>
 
@@ -145,11 +192,13 @@
         "DELIVERED",
         "CANCELED",
         "PENDING",
-        "FAILED"
+        "FAILED",
       ];
 
       // Set welcome message if available
-      document.getElementById("welcomeMsg").textContent = `Welcome, ${loginData.username || "Admin"}`;
+      document.getElementById("welcomeMsg").textContent = `Welcome, ${
+        loginData.username || "Admin"
+      }`;
 
       // Automatically fetch orders on page load.
       document.addEventListener("DOMContentLoaded", getAllOrders);
@@ -163,12 +212,14 @@
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
 
           if (response.status === 401) {
-            throw new Error("Unauthorized access. Please contact with admin support");
+            throw new Error(
+              "Unauthorized access. Please contact with admin support"
+            );
           }
 
           const text = await response.text();
@@ -198,11 +249,12 @@
           </tr>`;
           return;
         }
-        orderList.innerHTML = orders.map((order) => {
-          let rowClass = "";
-          if (order.status === "CANCELED") rowClass = "canceled";
-          else if (order.status === "DELIVERED") rowClass = "delivered";
-          return `<tr class="${rowClass}">
+        orderList.innerHTML = orders
+          .map((order) => {
+            let rowClass = "";
+            if (order.status === "CANCELED") rowClass = "canceled";
+            else if (order.status === "DELIVERED") rowClass = "delivered";
+            return `<tr class="${rowClass}">
             <td class="border px-4 py-2">${order.orderId}</td>
             <td class="border px-4 py-2">${order.userId || ""}</td>
             <td class="border px-4 py-2">${order.customerName}</td>
@@ -210,18 +262,30 @@
             <td class="border px-4 py-2">₹${order.totalAmount}</td>
             <td class="border px-4 py-2">${order.totalQuantity}</td>
             <td class="border px-4 py-2">
-              <select class="border px-2 py-1" onchange="updateStatus(${order.orderId}, this.value)" ${order.status === "CANCELED" ? "disabled" : ""}>
-                ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? "selected" : ""}>${status}</option>`).join("")}
+              <select class="border px-2 py-1" onchange="updateStatus(${
+                order.orderId
+              }, this.value)" ${order.status === "CANCELED" ? "disabled" : ""}>
+                ${statusOptions
+                  .map(
+                    (status) =>
+                      `<option value="${status}" ${
+                        order.status === status ? "selected" : ""
+                      }>${status}</option>`
+                  )
+                  .join("")}
               </select>
             </td>
             <td class="border px-4 py-2">${order.createdAt}</td>
             <td class="border px-4 py-2">
-              <button onclick="showOrderItems(${order.orderId})" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition-colors">
+              <button onclick="showOrderItems(${
+                order.orderId
+              })" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition-colors">
                 View Items
               </button>
             </td>
           </tr>`;
-        }).join("");
+          })
+          .join("");
       }
 
       /**
@@ -230,17 +294,25 @@
       async function updateStatus(orderId, newStatus) {
         if (newStatus === "CANCELED") {
           try {
-            const response = await fetch(`${COMMON_BASE_URL}/cancel/${orderId}`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
+            const response = await fetch(
+              `${COMMON_BASE_URL}/cancel/${orderId}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
               }
-            });
+            );
             if (!response.ok)
-              throw new Error(`Failed to cancel order. Status: ${response.status}`);
+              throw new Error(
+                `Failed to cancel order. Status: ${response.status}`
+              );
             const updatedOrder = await response.json();
-            console.log(`Order ${orderId} canceled successfully.`, updatedOrder);
+            console.log(
+              `Order ${orderId} canceled successfully.`,
+              updatedOrder
+            );
             getAllOrders();
           } catch (error) {
             console.error("Error canceling order:", error);
@@ -248,18 +320,26 @@
           }
         } else {
           try {
-            const response = await fetch(`${ADMIN_BASE_URL}/update/${orderId}/${newStatus}`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-              },
-              body: JSON.stringify(newStatus)
-            });
+            const response = await fetch(
+              `${ADMIN_BASE_URL}/update/${orderId}/${newStatus}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(newStatus),
+              }
+            );
             if (!response.ok)
-              throw new Error(`Failed to update order status. Status: ${response.status}`);
+              throw new Error(
+                `Failed to update order status. Status: ${response.status}`
+              );
             const updatedOrder = await response.json();
-            console.log(`Order ${orderId} status updated to ${newStatus}.`, updatedOrder);
+            console.log(
+              `Order ${orderId} status updated to ${newStatus}.`,
+              updatedOrder
+            );
             getAllOrders();
           } catch (error) {
             console.error("Error updating order status:", error);
@@ -277,20 +357,26 @@
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
           if (!response.ok)
-            throw new Error(`Failed to fetch order ${orderId}. Status: ${response.status}`);
+            throw new Error(
+              `Failed to fetch order ${orderId}. Status: ${response.status}`
+            );
           const order = await response.json();
           const modalContent = document.getElementById("modalContent");
-          modalContent.innerHTML = order.items.map(item => `
+          modalContent.innerHTML = order.items
+            .map(
+              (item) => `
             <div class="border p-2 rounded mb-2">
               <p><strong>Item:</strong> ${item.menuItemName}</p>
               <p><strong>Quantity:</strong> ${item.quantity}</p>
               <p><strong>Subtotal:</strong> ₹${item.subTotal}</p>
             </div>
-          `).join("");
+          `
+            )
+            .join("");
           openModal();
         } catch (error) {
           console.error("Error fetching order details:", error);
@@ -311,8 +397,8 @@
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
           if (!response.ok)
             throw new Error(`Order not found. Status: ${response.status}`);
@@ -331,15 +417,20 @@
           return;
         }
         try {
-          const response = await fetch(`${ADMIN_BASE_URL}/allOrder/getById/${userId}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
+          const response = await fetch(
+            `${ADMIN_BASE_URL}/allOrder/getById/${userId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
-          });
+          );
           if (!response.ok)
-            throw new Error(`No orders found for this user. Status: ${response.status}`);
+            throw new Error(
+              `No orders found for this user. Status: ${response.status}`
+            );
           const orders = await response.json();
           renderOrders(orders);
         } catch (error) {
@@ -374,10 +465,15 @@
         // Adjust toDate to include the full day.
         toDate.setHours(23, 59, 59, 999);
         console.log("Filtering orders from", fromDate, "to", toDate);
-        const filteredOrders = allOrders.filter(order => {
+        const filteredOrders = allOrders.filter((order) => {
           const orderDate = parseOrderDate(order.createdAt);
           if (isNaN(orderDate)) {
-            console.error("Invalid order date:", order.createdAt, "for order:", order.orderId);
+            console.error(
+              "Invalid order date:",
+              order.createdAt,
+              "for order:",
+              order.orderId
+            );
             return false;
           }
           return orderDate >= fromDate && orderDate <= toDate;
@@ -392,6 +488,15 @@
       function closeModal() {
         document.getElementById("modal").classList.add("hidden");
       }
+
+      function resetFilters() {
+        document.getElementById("searchOrderId").value = "";
+        document.getElementById("searchUserId").value = "";
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
+        getAllOrders();
+      }
+
       function goToProfile() {
         window.location.href = "userprofile.html";
       }

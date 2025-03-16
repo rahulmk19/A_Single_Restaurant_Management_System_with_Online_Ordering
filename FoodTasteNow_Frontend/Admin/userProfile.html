@@ -56,7 +56,7 @@
   <body class="bg-gray-100">
     <!-- The navbar will be inserted here -->
     <div id="navbarContainer"></div>
-    
+
     <!-- For admin users, include a left sidebar -->
     <div id="pageContainer"></div>
 
@@ -66,15 +66,18 @@
       if (!loginData || !loginData.token) {
         window.location.href = "../User/login.html";
       }
-      
+
       // Check role (support both array and string formats)
       let isAdmin = false;
       if (Array.isArray(loginData.roles)) {
-        isAdmin = loginData.roles.includes("ROLE_ADMIN") || loginData.roles.includes("ADMIN");
+        isAdmin =
+          loginData.roles.includes("ROLE_ADMIN") ||
+          loginData.roles.includes("ADMIN");
       } else {
-        isAdmin = (loginData.roles === "ADMIN" || loginData.roles === "ROLE_ADMIN");
+        isAdmin =
+          loginData.roles === "ADMIN" || loginData.roles === "ROLE_ADMIN";
       }
-      
+
       // Build the navigation bar
       let navbarHTML = "";
       if (isAdmin) {
@@ -83,7 +86,9 @@
           <div class="bg-blue-600 text-white p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50">
             <h2 class="text-3xl font-bold">Admin Dashboard</h2>
             <div>
-              <span id="welcomeMsg" class="mr-4 text-lg">Welcome, ${loginData.username || 'Admin'}</span>
+              <span id="welcomeMsg" class="mr-4 text-lg">Welcome, ${
+                loginData.username || "Admin"
+              }</span>
               <button class="bg-green-500 px-4 py-2 rounded text-lg mr-2" onclick="goToProfile()">Profile</button>
               <button class="bg-red-500 px-4 py-2 rounded text-lg" onclick="logout()">Logout</button>
             </div>
@@ -109,7 +114,9 @@
                   <button onclick="searchItems()" class="px-4 py-2 bg-white text-red-500 rounded-r-lg hover:bg-red-100">Search</button>
                 </div>
                 <div class="auth" id="authSection">
-                  <span class="text-white">Welcome, ${loginData.username || 'User'}</span>
+                  <span class="text-white">Welcome, ${
+                    loginData.username || "User"
+                  }</span>
                 </div>
                 <button class="md:hidden text-white focus:outline-none" onclick="toggleMobileMenu()">
                   <i class="fas fa-bars text-2xl"></i>
@@ -120,7 +127,7 @@
         `;
       }
       document.getElementById("navbarContainer").innerHTML = navbarHTML;
-      
+
       // Build the page container. For admin users, include a left sidebar.
       let pageContainerHTML = "";
       if (isAdmin) {
@@ -155,7 +162,7 @@
         `;
       }
       document.getElementById("pageContainer").innerHTML = pageContainerHTML;
-      
+
       // Function to return the profile content HTML
       function getProfileContent() {
         return `
@@ -204,7 +211,7 @@
           </button>
         `;
       }
-      
+
       // Profile editing functions
       let originalValues = {};
       function enableEdit(fieldId) {
@@ -212,17 +219,19 @@
         field.disabled = false;
         field.focus();
         originalValues[fieldId] = field.value;
-        if (fieldId === 'mobile') {
-          field.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
+        if (fieldId === "mobile") {
+          field.addEventListener("input", function () {
+            this.value = this.value.replace(/[^0-9]/g, "");
           });
         }
-        field.addEventListener('input', checkForChanges);
+        field.addEventListener("input", checkForChanges);
         checkForChanges();
       }
       function checkForChanges() {
         const saveButton = document.getElementById("saveButton");
-        const hasChanges = Object.keys(originalValues).some(key => document.getElementById(key).value !== originalValues[key]);
+        const hasChanges = Object.keys(originalValues).some(
+          (key) => document.getElementById(key).value !== originalValues[key]
+        );
         saveButton.disabled = !hasChanges;
       }
       async function updateProfile() {
@@ -236,24 +245,27 @@
           name: document.getElementById("name").value.trim(),
           username: document.getElementById("username").value.trim(),
           email: document.getElementById("email").value.trim(),
-          mobileNumber: document.getElementById("mobile").value.trim()
+          mobileNumber: document.getElementById("mobile").value.trim(),
         };
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/common/profile/update", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(updatedData)
-          });
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/common/profile/update",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(updatedData),
+            }
+          );
           if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || "Update failed");
           }
           const updatedProfile = await response.json();
           alert("Profile updated successfully!");
-          document.querySelectorAll("input").forEach(input => {
+          document.querySelectorAll("input").forEach((input) => {
             input.disabled = true;
             originalValues[input.id] = input.value;
           });
@@ -263,7 +275,7 @@
           alert(`Update failed: ${error.message}`);
         }
       }
-      
+
       // Initialize profile data
       document.addEventListener("DOMContentLoaded", async () => {
         const token = localStorage.getItem("jwtToken");
@@ -272,9 +284,12 @@
           return;
         }
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/users/common/profile", {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/users/common/profile",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (!response.ok) {
             throw new Error("Failed to load profile");
           }
@@ -287,14 +302,14 @@
             name: profile.name || "",
             username: profile.username || "",
             email: profile.email || "",
-            mobile: profile.mobileNumber || ""
+            mobile: profile.mobileNumber || "",
           };
         } catch (error) {
           console.error("Profile load error:", error);
           alert("Failed to load profile data");
         }
       });
-      
+
       // Additional nav bar functions for default user nav
       function toggleMobileMenu() {
         const mobileMenu = document.getElementById("mobileMenu");

@@ -22,18 +22,29 @@
     "
   >
     <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg">
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg"
+    >
       <div class="container mx-auto flex justify-between items-center">
         <div class="logo">
-          <a href="../index.html" class="text-white font-extrabold text-3xl tracking-wide"
-            >FoodTasteNow</a>
+          <a
+            href="../index.html"
+            class="text-white font-extrabold text-3xl tracking-wide"
+            >FoodTasteNow</a
+          >
         </div>
         <div class="hidden md:flex space-x-4">
-          <a href="../index.html" class="text-white hover:text-gray-200">Home</a>
-          <a href="../category.html" class="text-white hover:text-gray-200">Category</a>
+          <a href="../index.html" class="text-white hover:text-gray-200"
+            >Home</a
+          >
+          <a href="../category.html" class="text-white hover:text-gray-200"
+            >Category</a
+          >
         </div>
         <div class="hidden md:flex">
-          <a href="login.html" class="text-white hover:text-gray-200">Sign In</a>
+          <a href="login.html" class="text-white hover:text-gray-200"
+            >Sign In</a
+          >
         </div>
         <!-- Mobile Hamburger (optional) -->
         <button class="md:hidden text-white focus:outline-none">
@@ -43,12 +54,18 @@
     </nav>
 
     <!-- Sign Up Form Container -->
-    <div class="flex items-center justify-center min-h-screen px-4">
-      <div class="bg-white bg-opacity-90 max-w-md w-full p-8 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Sign Up</h2>
+    <div class="flex items-center justify-center min-h-screen pt-20 px-4">
+      <div
+        class="bg-white bg-opacity-90 max-w-md w-full p-8 rounded-lg shadow-lg"
+      >
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
+          Sign Up
+        </h2>
         <form id="createUserForm" class="space-y-4">
           <div>
-            <label for="username" class="block text-gray-700">Enter Username</label>
+            <label for="username" class="block text-gray-700"
+              >Enter Username</label
+            >
             <input
               type="text"
               id="username"
@@ -58,7 +75,9 @@
             />
           </div>
           <div>
-            <label for="name" class="block text-gray-700">Enter Full Name</label>
+            <label for="name" class="block text-gray-700"
+              >Enter Full Name</label
+            >
             <input
               type="text"
               id="name"
@@ -78,7 +97,9 @@
             />
           </div>
           <div>
-            <label for="mobileNumber" class="block text-gray-700">Enter Mobile Number</label>
+            <label for="mobileNumber" class="block text-gray-700"
+              >Enter Mobile Number</label
+            >
             <input
               type="text"
               id="mobileNumber"
@@ -88,7 +109,9 @@
             />
           </div>
           <div>
-            <label for="password" class="block text-gray-700">Enter Password</label>
+            <label for="password" class="block text-gray-700"
+              >Enter Password</label
+            >
             <input
               type="password"
               id="password"
@@ -103,65 +126,100 @@
           >
             Register
           </button>
-          <div id="error-message" class="text-red-600 text-center" style="display: none"></div>
-          <div id="success-message" class="text-green-600 text-center" style="display: none"></div>
+          <div
+            id="error-message"
+            class="text-red-600 text-center"
+            style="display: none"
+          ></div>
+          <div
+            id="success-message"
+            class="text-green-600 text-center"
+            style="display: none"
+          ></div>
         </form>
         <div class="mt-6 text-center">
-          <a href="login.html" class="text-blue-500 hover:text-blue-700 font-semibold"
-            >Already have an account? Sign In</a>
+          <a
+            href="login.html"
+            class="text-blue-500 hover:text-blue-700 font-semibold"
+            >Already have an account? Sign In</a
+          >
         </div>
       </div>
     </div>
 
     <script>
-      document.getElementById("createUserForm").addEventListener("submit", function (event) {
-        event.preventDefault();
+      document
+        .getElementById("createUserForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
 
-        let username = document.getElementById("username").value.trim();
-        let name = document.getElementById("name").value.trim();
-        let email = document.getElementById("email").value.trim();
-        let mobileNumber = document.getElementById("mobileNumber").value.trim();
-        let password = document.getElementById("password").value;
+          let username = document.getElementById("username").value.trim();
+          let name = document.getElementById("name").value.trim();
+          let email = document.getElementById("email").value.trim();
+          let mobileNumber = document
+            .getElementById("mobileNumber")
+            .value.trim();
+          let password = document.getElementById("password").value;
 
-        let errorMessage = [];
+          let errorMessage = [];
 
-        // Validate username: must start with an alphabet and include only alphanumeric characters.
-        if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(username)) {
-          errorMessage.push("Username should start with an alphabet and contain only alphanumeric characters.");
-        }
-        if (name.length < 3) {
-          errorMessage.push("Name should be at least 3 characters long.");
-        }
-        if (!/^\S+@\S+\.\S+$/.test(email)) {
-          errorMessage.push("Invalid email format.");
-        }
-        if (!/^\d{10}$/.test(mobileNumber)) {
-          errorMessage.push("Mobile number must be exactly 10 digits.");
-        }
-        // Check password against backend requirements
-        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(password)) {
-          errorMessage.push("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
-        }
-        if (password.length < 8) {
-          errorMessage.push("Password must be at least 8 characters long.");
-        }
+          // Validate username: must start with an alphabet and include only alphanumeric characters.
+          if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(username)) {
+            errorMessage.push(
+              "Username should start with an alphabet and contain only alphanumeric characters."
+            );
+          }
+          if (name.length < 3) {
+            errorMessage.push("Name should be at least 3 characters long.");
+          }
+          if (!/^\S+@\S+\.\S+$/.test(email)) {
+            errorMessage.push("Invalid email format.");
+          }
+          if (!/^\d{10}$/.test(mobileNumber)) {
+            errorMessage.push("Mobile number must be exactly 10 digits.");
+          }
+          // Check password against backend requirements
+          if (
+            !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
+              password
+            )
+          ) {
+            errorMessage.push(
+              "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+            );
+          }
+          if (password.length < 8) {
+            errorMessage.push("Password must be at least 8 characters long.");
+          }
 
-        if (errorMessage.length > 0) {
-          showMessage("error", errorMessage.map((msg) => `<p>${msg}</p>`).join(""));
-          return;
-        }
+          if (errorMessage.length > 0) {
+            showMessage(
+              "error",
+              errorMessage.map((msg) => `<p>${msg}</p>`).join("")
+            );
+            return;
+          }
 
-        createUser(username, name, email, mobileNumber, password);
-      });
+          createUser(username, name, email, mobileNumber, password);
+        });
 
       async function createUser(username, name, email, mobileNumber, password) {
         try {
           // Ensure the URL below exactly matches your backend mapping.
-          let response = await fetch("http://localhost:8081/foodtastenow/public-api/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, name, email, mobileNumber, password }),
-          });
+          let response = await fetch(
+            "http://localhost:8081/foodtastenow/public-api/auth/register",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                username,
+                name,
+                email,
+                mobileNumber,
+                password,
+              }),
+            }
+          );
 
           let data;
           const contentType = response.headers.get("Content-Type");
@@ -175,7 +233,10 @@
           console.log("Response data:", data);
 
           if (response.ok) {
-            showMessage("success", "You have registered successfully! Redirecting...");
+            showMessage(
+              "success",
+              "You have registered successfully! Redirecting..."
+            );
             setTimeout(() => {
               window.location.href = "login.html";
             }, 2000);
@@ -192,7 +253,10 @@
         if (typeof errorData === "string") {
           showMessage("error", `<p>${errorData}</p>`);
         } else if (errorData && errorData.errors) {
-          showMessage("error", errorData.errors.map((err) => `<p>${err}</p>`).join(""));
+          showMessage(
+            "error",
+            errorData.errors.map((err) => `<p>${err}</p>`).join("")
+          );
         } else if (errorData && errorData.message) {
           showMessage("error", `<p>${errorData.message}</p>`);
         } else {
@@ -201,11 +265,15 @@
       }
 
       function showMessage(type, message) {
-        let element = document.getElementById(type === "error" ? "error-message" : "success-message");
+        let element = document.getElementById(
+          type === "error" ? "error-message" : "success-message"
+        );
         element.innerHTML = message;
         element.style.display = "block";
 
-        let otherElement = document.getElementById(type === "error" ? "success-message" : "error-message");
+        let otherElement = document.getElementById(
+          type === "error" ? "success-message" : "error-message"
+        );
         otherElement.style.display = "none";
       }
     </script>

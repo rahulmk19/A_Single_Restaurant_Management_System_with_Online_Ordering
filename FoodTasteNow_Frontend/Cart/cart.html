@@ -57,18 +57,27 @@
   </head>
   <body class="bg-gray-100">
     <!-- Fixed Navbar (Header) -->
-    <nav class="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg z-50">
+    <nav
+      class="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg z-50"
+    >
       <div class="container mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-6">
           <div class="logo">
             <!-- Use ../ to go from Cart/ folder to project root -->
-            <a href="../index.html" class="text-white font-extrabold text-3xl tracking-wide">
+            <a
+              href="../index.html"
+              class="text-white font-extrabold text-3xl tracking-wide"
+            >
               FoodTasteNow
             </a>
           </div>
           <div class="nav-links hidden md:flex space-x-4" id="navLinks">
-            <a href="../index.html" class="text-white hover:text-gray-200">Home</a>
-            <a href="../category.html" class="text-white hover:text-gray-200">Category</a>
+            <a href="../index.html" class="text-white hover:text-gray-200"
+              >Home</a
+            >
+            <a href="../category.html" class="text-white hover:text-gray-200"
+              >Category</a
+            >
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -76,31 +85,48 @@
             <!-- Will be updated by updateNavbar() -->
             <a href="../User/login.html" class="text-white">Sign In</a>
           </div>
-          <button class="md:hidden text-white focus:outline-none" onclick="toggleMobileMenu()">
+          <button
+            class="md:hidden text-white focus:outline-none"
+            onclick="toggleMobileMenu()"
+          >
             <i class="fas fa-bars text-2xl"></i>
           </button>
         </div>
       </div>
     </nav>
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu hidden md:hidden bg-red-500 text-white p-4 fixed top-16 w-full z-40">
+    <div
+      id="mobileMenu"
+      class="mobile-menu hidden md:hidden bg-red-500 text-white p-4 fixed top-16 w-full z-40"
+    >
       <a href="../index.html" class="block py-2">Home</a>
       <a href="../category.html" class="block py-2">Category</a>
       <a href="../User/login.html" class="block py-2">Sign In</a>
     </div>
 
     <!-- Cart Content -->
-    <div class="container mx-auto pt-20 px-4">
+    <div class="container mx-auto pt-10 px-4 pb-32 sm:pb-40">
       <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
-      <div id="cartContainer">
+      <!-- Responsive Scrollable Cart Items -->
+      <div
+        id="cartContainer"
+        class="overflow-y-auto max-h-[40vh] sm:max-h-[70vh]"
+      >
         <p>Loading your cart...</p>
       </div>
-      <div id="cartSummary" class="mt-6"></div>
-      <div class="mt-6">
-        <button id="placeOrderButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-          Place Order
-        </button>
-      </div>
+    </div>
+
+    <!-- Fixed Cart Details at Bottom -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white shadow p-2 sm:p-4 z-50">
+      <!-- Cart Summary (Total Items & Total Amount) -->
+      <div id="cartSummary" class="mb-2 sm:mb-4 text-sm sm:text-xl"></div>
+      <!-- Place Order Button -->
+      <button
+        id="placeOrderButton"
+        class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded sm:px-4 sm:py-2"
+      >
+        Place Order
+      </button>
     </div>
 
     <!-- Order Modal (Hidden by default) -->
@@ -149,10 +175,17 @@
             />
           </div>
           <div class="flex justify-end">
-            <button type="button" id="cancelOrderModal" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded mr-2">
+            <button
+              type="button"
+              id="cancelOrderModal"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded mr-2"
+            >
               Cancel
             </button>
-            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+            <button
+              type="submit"
+              class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+            >
               Place Order
             </button>
           </div>
@@ -207,7 +240,9 @@
               </a>
             </div>
           `;
-          const dropdownContainer = document.getElementById("userDropdownContainer");
+          const dropdownContainer = document.getElementById(
+            "userDropdownContainer"
+          );
           dropdownContainer.addEventListener("mouseenter", () => {
             dropdownContainer.classList.add("open");
           });
@@ -217,7 +252,7 @@
           document.getElementById("logout").addEventListener("click", (e) => {
             e.preventDefault();
             localStorage.removeItem("jwtToken");
-            localStorage.removeItem('loginData');
+            localStorage.removeItem("loginData");
             window.location.href = "../index.html";
           });
           fetchCartData();
@@ -230,9 +265,12 @@
       async function fetchCart() {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/cart/user",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             renderCart(cart);
@@ -248,35 +286,57 @@
       function renderCart(cart) {
         const container = document.getElementById("cartContainer");
         container.innerHTML = "";
+
         if (!cart.cartItem || cart.cartItem.length === 0) {
           container.innerHTML = "<p>Your cart is empty.</p>";
-          document.getElementById("cartSummary").innerHTML = "";
+          // Update badge and summary to 0 when cart is empty.
+          updateCartBadge({ totalQty: 0 });
+          document.getElementById(
+            "cartSummary"
+          ).innerHTML = `<p class="text-xl">Total Items: 0</p>
+                                                        <p class="text-xl">Total Amount: ₹0.00</p>`;
           return;
         }
-        cart.cartItem.forEach(item => {
+
+        cart.cartItem.forEach((item) => {
           const div = document.createElement("div");
-          div.className = "flex items-center bg-white p-4 rounded shadow mb-4";
+          div.className =
+            "flex flex-col md:flex-row items-center bg-white p-4 rounded shadow mb-4";
           div.innerHTML = `
-            <img src="${item.menuItem.imageUrl}" alt="${item.menuItem.name}" class="w-24 h-24 object-cover rounded mr-4">
-            <div class="flex-1">
-              <h2 class="text-xl font-bold">${item.menuItem.name}</h2>
-              <p class="text-gray-600">Price: ₹${item.menuItem.price.toFixed(2)}</p>
-              <p class="text-gray-600">Subtotal: ₹${item.subTotal.toFixed(2)}</p>
-              <div class="flex items-center mt-2">
-                <button onclick="changeQuantity(${item.menuItem.id}, ${item.quantity - 1})" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">-</button>
-                <span class="mx-2">${item.quantity}</span>
-                <button onclick="changeQuantity(${item.menuItem.id}, ${item.quantity + 1})" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">+</button>
-              </div>
-            </div>
-            <div>
-              <button onclick="removeCartItem(${item.menuItem.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Remove</button>
-            </div>
-          `;
+      <img src="${item.menuItem.imageUrl}" alt="${item.menuItem.name}"
+           class="w-16 h-16 md:w-24 md:h-24 object-cover rounded mr-0 md:mr-4 mb-2 md:mb-0">
+      <div class="flex-1">
+        <h2 class="text-xl font-bold">${item.menuItem.name}</h2>
+        <p class="text-gray-600">Price: ₹${item.menuItem.price.toFixed(2)}</p>
+        <p class="text-gray-600">Subtotal: ₹${item.subTotal.toFixed(2)}</p>
+        <div class="flex items-center mt-2">
+          <button onclick="changeQuantity(${item.menuItem.id}, ${
+            item.quantity - 1
+          })" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">-</button>
+          <span class="mx-2">${item.quantity}</span>
+          <button onclick="changeQuantity(${item.menuItem.id}, ${
+            item.quantity + 1
+          })" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">+</button>
+        </div>
+      </div>
+      <div>
+        <button onclick="removeCartItem(${
+          item.menuItem.id
+        })" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Remove</button>
+      </div>
+    `;
           container.appendChild(div);
         });
-        const summary = document.getElementById("cartSummary");
-        summary.innerHTML = `<p class="text-xl">Total Items: ${cart.totalQty}</p>
-                             <p class="text-xl">Total Amount: ₹${cart.totalAmount.toFixed(2)}</p>`;
+
+        document.getElementById(
+          "cartSummary"
+        ).innerHTML = `<p class="text-xl">Total Items: ${cart.totalQty}</p>
+                                                      <p class="text-xl">Total Amount: ₹${cart.totalAmount.toFixed(
+                                                        2
+                                                      )}</p>`;
+
+        // Update the navbar badge.
+        updateCartBadge(cart);
       }
 
       // Update quantity using the PATCH endpoint.
@@ -287,10 +347,13 @@
         }
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/update/${menuItemId}/${newQuantity}`, {
-            method: "PATCH",
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/cart/user/update/${menuItemId}/${newQuantity}`,
+            {
+              method: "PATCH",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             renderCart(cart);
@@ -306,10 +369,13 @@
       async function removeCartItem(menuItemId) {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`, {
-            method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             renderCart(cart);
@@ -325,9 +391,12 @@
       async function fetchCartData() {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/cart/user",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             updateCartBadge(cart);
@@ -363,65 +432,86 @@
       }
 
       // Handle the order form submission with validation.
-      document.getElementById("orderForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const customerName = document.getElementById("customerName").value.trim();
-  const customerAddress = document.getElementById("customerAddress").value.trim();
-  const contactNum = document.getElementById("contactNum").value.trim();
-  const alternateContactNum = document.getElementById("alternateContactNum").value.trim();
+      document
+        .getElementById("orderForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const customerName = document
+            .getElementById("customerName")
+            .value.trim();
+          const customerAddress = document
+            .getElementById("customerAddress")
+            .value.trim();
+          const contactNum = document.getElementById("contactNum").value.trim();
+          const alternateContactNum = document
+            .getElementById("alternateContactNum")
+            .value.trim();
 
-  // Client-side validation: All fields must be provided.
-  if (!customerName || !customerAddress || !contactNum || !alternateContactNum) {
-    alert("Please provide all customer details before placing the order.");
-    return;
-  }
+          // Client-side validation: All fields must be provided.
+          if (
+            !customerName ||
+            !customerAddress ||
+            !contactNum ||
+            !alternateContactNum
+          ) {
+            alert(
+              "Please provide all customer details before placing the order."
+            );
+            return;
+          }
 
-  // Build the payload.
-  const orderDetails = {
-    customerName,
-    customerAddress,
-    contactNum,
-    alternateContactNum
-  };
+          // Build the payload.
+          const orderDetails = {
+            customerName,
+            customerAddress,
+            contactNum,
+            alternateContactNum,
+          };
 
-  const token = localStorage.getItem("jwtToken");
-  try {
-    const response = await fetch("http://localhost:8081/foodtastenow/cart/user/placedorder", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(orderDetails)
-    });
-    if (response.ok) {
-      const orderResponse = await response.json();
-      alert("Order placed successfully!");
-      hideOrderModal();
-      // Fetch updated cart data to update the badge (which should now be zero)
-      await fetchCartData();
-      // Then redirect to the orders page
-      window.location.href = "../Orders/allOrders.html";
-    } else {
-      console.error("Failed to place order");
-    }
-  } catch (error) {
-    console.error("Error placing order:", error);
-  }
-});
-
+          const token = localStorage.getItem("jwtToken");
+          try {
+            const response = await fetch(
+              "http://localhost:8081/foodtastenow/cart/user/placedorder",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(orderDetails),
+              }
+            );
+            if (response.ok) {
+              const orderResponse = await response.json();
+              alert("Order placed successfully!");
+              hideOrderModal();
+              // Fetch updated cart data to update the badge (which should now be zero)
+              await fetchCartData();
+              // Then redirect to the orders page
+              window.location.href = "../Orders/allOrders.html";
+            } else {
+              console.error("Failed to place order");
+            }
+          } catch (error) {
+            console.error("Error placing order:", error);
+          }
+        });
 
       // Cancel button for order modal.
-      document.getElementById("cancelOrderModal").addEventListener("click", hideOrderModal);
+      document
+        .getElementById("cancelOrderModal")
+        .addEventListener("click", hideOrderModal);
 
       // When Place Order button is clicked, show the modal form.
-      document.getElementById("placeOrderButton").addEventListener("click", () => {
-        if (!getNameFromToken()) {
-          window.location.href = "../User/login.html";
-          return;
-        }
-        showOrderModal();
-      });
+      document
+        .getElementById("placeOrderButton")
+        .addEventListener("click", () => {
+          if (!getNameFromToken()) {
+            window.location.href = "../User/login.html";
+            return;
+          }
+          showOrderModal();
+        });
 
       // Initialize on page load.
       document.addEventListener("DOMContentLoaded", () => {
