@@ -4,7 +4,7 @@
 This project is a complete Restaurant Management System with Online Ordering capabilities. It allows customers to browse the menu, place orders, and track their order status. The system also includes an admin panel for managing menu items, orders, and customers. The backend is built using Spring Boot, providing a RESTful API for seamless integration with the frontend.
 
 ### 🌐 Deployed Frontend Link:
-[Coming Soon]
+https://foodtastenow.netlify.app/
 
 ### 📜 Swagger API Documentation:
 [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
