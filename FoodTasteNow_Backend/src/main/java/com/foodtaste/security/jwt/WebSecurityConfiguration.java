@@ -24,8 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.foodtaste.constant.SecurityConstants;
+import com.foodtaste.constant.SecurityConstant;
 
 @Configuration
 @EnableWebSecurity
@@ -33,33 +34,43 @@ public class WebSecurityConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfiguration.class);
 
-    @Autowired
-    private JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public WebSecurityConfiguration(JwtFilter jwtFilter, UserDetailsService userDetailsService) {
+        this.jwtFilter = jwtFilter;
+        this.userDetailsService = userDetailsService;
+    }
+    
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    	logger.info("Configuring security filter chain...");
         http
             .csrf(csrf -> csrf.disable())
             .cors().and()
             .authorizeHttpRequests(authorize -> authorize
+    		// Public endpoints
+            		.requestMatchers(
+            			    SecurityConstant.public_Auth, 
+            			    SecurityConstant.public_MenuItem,
+            			    "/swagger-ui/**",          // Allow Swagger UI
+            			    "/v3/api-docs/**",         // Allow OpenAPI JSON docs
+            			    "/swagger-ui.html",        // Alternative Swagger UI path
+            			    "/swagger-resources/**",   // Swagger resources
+            			    "/webjars/**"              // WebJars for Swagger UI
+            			)
+            			.permitAll()
                 // Admin endpoints
-                .requestMatchers(SecurityConstants.menuItem,SecurityConstants.admin_user, "foodtastenow/orders/admin/**","foodtastenow/orders/admin/getAll")
+                .requestMatchers(SecurityConstant.admin_MenuItem,SecurityConstant.admin_OrderDetails, SecurityConstant.admin_RoleDetails,SecurityConstant.admin_UserDetails)
                     .hasRole("ADMIN")
                 // Endpoints common to both Admin and User roles
-                .requestMatchers("foodtastenow/orders/common/**","foodtastenow/cart/user",SecurityConstants.common_user,SecurityConstants.common_Profile)
+                .requestMatchers(SecurityConstant.common_OrderDetails,SecurityConstant.common_UserDetails)
                     .hasAnyRole("ADMIN", "USER")
                 // User endpoints
-                .requestMatchers(SecurityConstants.userDetails,
-                                 "foodtastenow/orders/**",
-                                 "foodtastenow/orders/user/getalluserorders",
-                                 SecurityConstants.cart)
+                .requestMatchers(SecurityConstant.user_Cart,SecurityConstant.user_OrderDetails,SecurityConstant.user_UserDetails)
                     .hasRole("USER")
-                // Public endpoints
-                .requestMatchers(SecurityConstants.public_Auth, SecurityConstants.public_Item)
-                    .permitAll()
+                
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
@@ -69,11 +80,13 @@ public class WebSecurityConfiguration {
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .httpBasic(Customizer.withDefaults());
 
+        logger.info("Security filter chain configured successfully.");
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+    	logger.info("Configuring CORS...");
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
@@ -82,6 +95,8 @@ public class WebSecurityConfiguration {
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        
+        logger.info("CORS configured successfully.");
         return source;
     }
 

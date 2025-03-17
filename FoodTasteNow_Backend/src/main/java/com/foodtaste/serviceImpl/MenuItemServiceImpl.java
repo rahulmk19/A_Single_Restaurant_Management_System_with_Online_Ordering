@@ -1,16 +1,19 @@
 package com.foodtaste.serviceImpl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.foodtaste.enums.CategoryEnum;
 import com.foodtaste.exception.MenuItemException;
 import com.foodtaste.model.MenuItem;
 import com.foodtaste.repository.MenuItemRepo;
 import com.foodtaste.service.MenuItemService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -19,6 +22,34 @@ public class MenuItemServiceImpl implements MenuItemService {
 
 	@Autowired
 	private MenuItemRepo menuItemRepository;
+
+	@PostConstruct
+	public void insertInitialData() {
+		if (menuItemRepository.count() == 0) {
+			List<MenuItem> menuItems = List.of(
+					new MenuItem(null, "Gulab Jamun", new BigDecimal("30.00"), 17, CategoryEnum.DESSERT,
+							"https://i.pinimg.com/originals/a4/70/fe/a470fefcda1f459f3d9d5c3b5aa1a502.jpg"),
+					new MenuItem(null, "Butter Chicken", new BigDecimal("200.00"), 18, CategoryEnum.NORTH_INDIAN,
+							"https://therecipecritic.com/wp-content/uploads/2017/12/PataksButterChicken11.jpg"),
+					new MenuItem(null, "Masala Dosa", new BigDecimal("50.00"), 18, CategoryEnum.SOUTH_INDIAN,
+							"https://apollosugar.com/wp-content/uploads/2018/12/Masala-Dosa.jpg"),
+					new MenuItem(null, "Chocolate Cake", new BigDecimal("450.00"), 17, CategoryEnum.CAKES,
+							"https://cdn.igp.com/f_auto,q_auto,t_pnopt9prodlp/products/p-chocolate-almond-cake-half-kg--67974-m.jpg"),
+					new MenuItem(null, "Cheese Pizza", new BigDecimal("299.00"), 20, CategoryEnum.FAST_FOOD,
+							"https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg"),
+					new MenuItem(null, "Pani Puri", new BigDecimal("40.00"), 19, CategoryEnum.STREET_FOOD,
+							"https://external-preview.redd.it/3EAHTofTOsKD2TfbVoVSFq5AFZOr-PsPmgrYx7R_-P8.jpg?auto=webp&s=206fc5eb1198baadafca62392022c0b100a39bf5"),
+					new MenuItem(null, "Greek Salad", new BigDecimal("100.00"), 18, CategoryEnum.HEALTHY_DIET_FOOD,
+							"https://www.olivetomato.com/wp-content/uploads/2019/06/Best-Greek-Salad-Recipe-1.jpg"),
+					new MenuItem(null, "Cold Coffee", new BigDecimal("100.00"), 20, CategoryEnum.BEVERAGES,
+							"https://mytastycurry.com/wp-content/uploads/2020/04/Cafe-style-cold-coffee-with-icecream.jpg"),
+					new MenuItem(null, "Chola Bhatura", new BigDecimal("70.00"), 19, CategoryEnum.NORTH_INDIAN,
+							"https://static.vecteezy.com/system/resources/previews/015/933/458/large_2x/chole-bhature-is-a-north-indian-food-dish-a-combination-of-chana-masala-and-bhatura-or-puri-free-photo.jpg"),
+					new MenuItem(null, "Tomato Pizza", new BigDecimal("399.00"), 10, CategoryEnum.FAST_FOOD,
+							"https://cdn.pixabay.com/photo/2024/04/03/20/39/ai-generated-8673813_1280.png"));
+			menuItemRepository.saveAll(menuItems);
+		}
+	}
 
 	@Override
 	public MenuItem createItem(MenuItem menuItem) {

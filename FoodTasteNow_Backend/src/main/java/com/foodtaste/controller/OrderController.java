@@ -33,7 +33,7 @@ public class OrderController {
 	@Autowired
 	private OrderDetailService orderDetailService;
 
-	@PostMapping(AppConstants.SAVE)
+	@PostMapping(AppConstants.USER + AppConstants.SAVE)
 	public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest request) {
 		OrderResponse response = orderDetailService.createOrder(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -60,7 +60,7 @@ public class OrderController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/with-items/{id}")
+	@GetMapping(AppConstants.ADMIN + "/with-items/{id}")
 	public ResponseEntity<OrderDetail> getOrderDetailsWithItemsById(@PathVariable Integer id) {
 		log.info("Received request to fetch order details with items for order ID: {}", id);
 		OrderDetail response = orderDetailService.getOrderByIdWithItems(id);
