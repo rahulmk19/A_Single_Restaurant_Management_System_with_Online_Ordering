@@ -1,7 +1,7 @@
 # 🍽️ A Single Restaurant Management System with Online Ordering
 
 ## 📝 Description
-This project is a complete Restaurant Management System with Online Ordering capabilities. It allows customers to browse the menu, place orders, and track their order status. The system also includes an admin panel for managing menu items, orders, and customers. The backend is built using Spring Boot, providing a RESTful API for seamless integration with the front end.
+This project is a complete Restaurant Management System with Online Ordering capabilities. It allows customers to browse the menu, place orders, and track their order status. The system also includes an admin panel for managing menu items, orders, and customers. The backend is built using Spring Boot, providing a RESTful API for seamless integration with the front-end technologies.
 
 ### 🌐 Deployed Frontend Link:
 https://foodtastenow.netlify.app/
