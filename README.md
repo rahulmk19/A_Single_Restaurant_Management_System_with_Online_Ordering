@@ -1,13 +1,16 @@
 # 🍽️ A Single Restaurant Management System with Online Ordering
 
 ## 📝 Description
-This project is a complete Restaurant Management System with Online Ordering capabilities. It allows customers to browse the menu, place orders, and track their order status. The system also includes an admin panel for managing menu items, orders, and customers. The backend is built using Spring Boot, providing a RESTful API for seamless integration with the frontend.
+This project is a complete Restaurant Management System with Online Ordering capabilities. It allows customers to browse the menu, place orders, and track their order status. The system also includes an admin panel for managing menu items, orders, and customers. The backend is built using Spring Boot, providing a RESTful API for seamless integration with the front end.
 
 ### 🌐 Deployed Frontend Link:
 https://foodtastenow.netlify.app/
 
 ### 📜 Swagger API Documentation:
 [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
+
+## ER Diagram
+![ER Diagram](https://github.com/rahulmk19/A_Single_Restaurant_Management_System_with_Online_Ordering/blob/master/FoodTasteNow_Frontend/Image/ER%20Diagram%20of%20FoodTaste.png)
 
 ## 🏠 Home Page
 ![Home Page](https://github.com/rahulmk19/A_Single_Restaurant_Management_System_with_Online_Ordering/raw/master/FoodTasteNow_Frontend/Image/Home%20Page.png)
