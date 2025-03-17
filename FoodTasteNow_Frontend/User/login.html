@@ -23,19 +23,31 @@
     </style>
   </head>
   <body class="min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg">
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg"
+    >
       <div class="container mx-auto flex justify-between items-center">
         <div class="logo">
-          <a href="../index.html" class="text-white font-extrabold text-3xl tracking-wide">FoodTasteNow</a>
+          <a
+            href="../index.html"
+            class="text-white font-extrabold text-3xl tracking-wide"
+            >FoodTasteNow</a
+          >
         </div>
         <div class="hidden md:flex space-x-4">
-          <a href="../index.html" class="text-white hover:text-gray-200">Home</a>
-          <a href="../category.html" class="text-white hover:text-gray-200">Category</a>
+          <a href="../index.html" class="text-white hover:text-gray-200"
+            >Home</a
+          >
+          <a href="../category.html" class="text-white hover:text-gray-200"
+            >Category</a
+          >
         </div>
         <div class="hidden md:flex">
-          <a href="signup.html" class="text-white hover:text-gray-200">Sign Up</a>
+          <a href="signup.html" class="text-white hover:text-gray-200"
+            >Sign up</a
+          >
         </div>
+        <!-- Mobile Hamburger (optional) -->
         <button class="md:hidden text-white focus:outline-none">
           <i class="fas fa-bars text-2xl"></i>
         </button>
@@ -44,7 +56,9 @@
 
     <!-- Login Form Container -->
     <div class="flex items-center justify-center min-h-screen px-4">
-      <div class="bg-white bg-opacity-90 max-w-md w-full p-8 rounded-lg shadow-lg">
+      <div
+        class="bg-white bg-opacity-90 max-w-md w-full p-8 rounded-lg shadow-lg"
+      >
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
         <form id="loginForm" class="space-y-4">
           <div>
@@ -73,68 +87,95 @@
           >
             Login
           </button>
-          <div id="error-message" class="text-red-600 text-center" style="display: none"></div>
-          <div id="success-message" class="text-green-600 text-center" style="display: none"></div>
+          <div
+            id="error-message"
+            class="text-red-600 text-center"
+            style="display: none"
+          ></div>
+          <div
+            id="success-message"
+            class="text-green-600 text-center"
+            style="display: none"
+          ></div>
         </form>
         <div class="mt-6 text-center">
-          <a href="signup.html" class="text-blue-500 hover:text-blue-700 font-semibold">Don't have an account? Sign Up</a>
+          <a
+            href="signup.html"
+            class="text-blue-500 hover:text-blue-700 font-semibold"
+            >Don't have an account? Sign Up</a
+          >
         </div>
       </div>
     </div>
 
     <script>
-      document.getElementById("loginForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
 
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
 
-        try {
-          const response = await fetch("http://localhost:8081/foodtastenow/public-api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            
-            // Store authentication details (token and whole response) in localStorage
-            localStorage.setItem("jwtToken", data.token);
-            localStorage.setItem("loginData", JSON.stringify(data));
-
-            // Show success message
-            document.getElementById("success-message").innerText = "Login successful! Redirecting...";
-            document.getElementById("success-message").style.display = "block";
-            document.getElementById("error-message").style.display = "none";
-
-            // Check if user is admin by examining the role object
-            const isAdmin = data.role && data.role.roleName === "Admin";
-
-            // Redirect based on the isAdmin check
-            setTimeout(() => {
-              if (isAdmin) {
-                window.location.href = "../Admin/adminDashboard.html";
-              } else {
-                window.location.href = "../index.html";
+          try {
+            const response = await fetch(
+              "http://localhost:8081/foodtastenow/public-api/auth/login",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
               }
-            }, 2000);
+            );
 
-          } else {
-            const errorData = await response.json();
-            console.error("Error during login:", errorData);
+            if (response.ok) {
+              const data = await response.json();
+
+              localStorage.setItem("jwtToken", data.token);
+              localStorage.setItem("loginData", JSON.stringify(data));
+
+              // Show success message
+              document.getElementById("success-message").innerText =
+                "Login successful! Redirecting...";
+              document.getElementById("success-message").style.display =
+                "block";
+              document.getElementById("error-message").style.display = "none";
+
+              const isAdmin = data.role && data.role.roleName === "Admin";
+
+              setTimeout(() => {
+                if (isAdmin) {
+                  window.location.href = "../Admin/adminDashboard.html";
+                } else {
+                  window.location.href = "../index.html";
+                }
+              }, 2000);
+            } else {
+              let errorData;
+              try {
+                errorData = await response.json();
+              } catch (err) {
+                errorData = {};
+              }
+
+              // Check for Unauthorized (401)
+              if (response.status === 401) {
+                document.getElementById("error-message").innerText =
+                  "Please check your credential.";
+              } else {
+                document.getElementById("error-message").innerText =
+                  errorData.message || "An error occurred. Please try again.";
+              }
+              document.getElementById("error-message").style.display = "block";
+              document.getElementById("success-message").style.display = "none";
+            }
+          } catch (error) {
+            console.error("Network error:", error);
             document.getElementById("error-message").innerText =
-              errorData.message || "Invalid credentials. Please try again.";
+              "Network error: Please try again later.";
             document.getElementById("error-message").style.display = "block";
             document.getElementById("success-message").style.display = "none";
           }
-        } catch (error) {
-          console.error("Network error:", error);
-          document.getElementById("error-message").innerText = "Network error: Please try again later.";
-          document.getElementById("error-message").style.display = "block";
-          document.getElementById("success-message").style.display = "none";
-        }
-      });
+        });
     </script>
   </body>
 </html>

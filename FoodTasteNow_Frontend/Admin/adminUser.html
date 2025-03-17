@@ -78,7 +78,7 @@
               Filter
             </button>
             <button
-              onclick="renderUsers(allUsers)"
+              onclick="resetFilters()"
               class="bg-gray-500 text-white px-4 py-2 rounded ml-2"
             >
               Reset Filters
@@ -324,6 +324,13 @@
           );
         });
         renderUsers(filtered);
+      }
+
+      function resetFilters() {
+        document.getElementById("filterUsername").value = "";
+        document.getElementById("filterMobile").value = "";
+        document.getElementById("filterEmail").value = "";
+        renderUsers(allUsers);
       }
 
       function logout() {

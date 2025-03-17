@@ -49,26 +49,39 @@
   </head>
   <body class="bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg">
+    <nav
+      class="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-pink-500 p-4 shadow-lg z-50"
+    >
       <div class="container mx-auto flex justify-between items-center">
-        <a href="index.html" class="text-white font-extrabold text-3xl tracking-wide">FoodTasteNow</a>
-        <div class="hidden md:flex space-x-4" id="navLinks">
+        <a
+          href="index.html"
+          class="text-white font-extrabold text-3xl tracking-wide"
+        >
+          FoodTasteNow
+        </a>
+        <div class="hidden md:flex space-x-8" id="navLinks">
           <a href="index.html" class="text-white hover:text-gray-200">Home</a>
-          <a href="category.html" class="text-white hover:text-gray-200">Category</a>
+          <a href="category.html" class="text-white hover:text-gray-200"
+            >Category</a
+          >
         </div>
         <div id="authSection" class="hidden md:flex">
           <!-- Updated dynamically based on login status -->
-          <a href="User/login.html" class="text-white hover:text-gray-200">Sign In</a>
+          <a href="User/login.html" class="text-white hover:text-gray-200"
+            >Sign In</a
+          >
         </div>
       </div>
     </nav>
 
     <!-- Category Page Content -->
-    <div class="container mx-auto mt-8 p-4 text-center">
+    <div class="container mx-auto mt-16 p-4 text-center">
       <h1 class="text-3xl font-bold text-gray-800 mb-6">Explore Categories</h1>
 
       <!-- Search and Sort Section -->
-      <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
+      <div
+        class="flex flex-col md:flex-row justify-center items-center gap-4 mb-6"
+      >
         <!-- Search Bar -->
         <input
           type="text"
@@ -89,7 +102,9 @@
       </div>
 
       <!-- Price Range Filter -->
-      <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-6">
+      <div
+        class="flex flex-col md:flex-row justify-center items-center gap-4 mb-6"
+      >
         <input
           type="number"
           id="minPrice"
@@ -106,9 +121,10 @@
 
       <!-- Filter by Category -->
       <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Category</h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+          Filter by Category
+        </h2>
         <div class="flex flex-wrap justify-center gap-4">
-        
           <button
             class="category-filter px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
             data-category="ALL"
@@ -167,7 +183,10 @@
       </div>
 
       <!-- Products Grid -->
-      <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+      <div
+        id="productGrid"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center"
+      >
         <!-- Products will be dynamically inserted here -->
       </div>
     </div>
@@ -187,7 +206,13 @@
         try {
           const payloadBase64 = token.split(".")[1];
           const payload = JSON.parse(atob(payloadBase64));
-          return payload.firstName || payload.username || payload.name || payload.sub || null;
+          return (
+            payload.firstName ||
+            payload.username ||
+            payload.name ||
+            payload.sub ||
+            null
+          );
         } catch (error) {
           console.error("Error decoding token:", error);
           return null;
@@ -222,9 +247,15 @@
             </a>
           </div>
         `;
-        const dropdownContainer = document.getElementById("userDropdownContainer");
-        dropdownContainer.addEventListener("mouseenter", () => dropdownContainer.classList.add("open"));
-        dropdownContainer.addEventListener("mouseleave", () => dropdownContainer.classList.remove("open"));
+        const dropdownContainer = document.getElementById(
+          "userDropdownContainer"
+        );
+        dropdownContainer.addEventListener("mouseenter", () =>
+          dropdownContainer.classList.add("open")
+        );
+        dropdownContainer.addEventListener("mouseleave", () =>
+          dropdownContainer.classList.remove("open")
+        );
         document.getElementById("logout").addEventListener("click", (e) => {
           e.preventDefault();
           localStorage.removeItem("jwtToken");
@@ -241,9 +272,12 @@
         const token = localStorage.getItem("jwtToken");
         if (!token) return;
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/cart/user", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/cart/user",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             cartMap = {};
@@ -266,10 +300,13 @@
       async function addToCart(menuItemId, button) {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/save/${menuItemId}`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/cart/user/save/${menuItemId}`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             if (cart.cartItem && Array.isArray(cart.cartItem)) {
@@ -284,7 +321,11 @@
             button.classList.add("bg-red-500", "hover:bg-red-600");
             updateCartBadge(cart);
           } else {
-            console.error("Failed to add item to cart", response.status, await response.text());
+            console.error(
+              "Failed to add item to cart",
+              response.status,
+              await response.text()
+            );
           }
         } catch (error) {
           console.error("Error adding item to cart:", error);
@@ -294,10 +335,13 @@
       async function removeFromCart(menuItemId, button) {
         const token = localStorage.getItem("jwtToken");
         try {
-          const response = await fetch(`http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await fetch(
+            `http://localhost:8081/foodtastenow/cart/user/delete/${menuItemId}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.ok) {
             const cart = await response.json();
             delete cartMap[menuItemId];
@@ -306,7 +350,11 @@
             button.classList.add("bg-blue-500", "hover:bg-blue-600");
             updateCartBadge(cart);
           } else {
-            console.error("Failed to remove item from cart", response.status, await response.text());
+            console.error(
+              "Failed to remove item from cart",
+              response.status,
+              await response.text()
+            );
           }
         } catch (error) {
           console.error("Error removing item from cart:", error);
@@ -342,7 +390,9 @@
       ------------------------------- */
       async function fetchCategoryItems() {
         try {
-          const response = await fetch("http://localhost:8081/foodtastenow/items/public-api/getAll");
+          const response = await fetch(
+            "http://localhost:8081/foodtastenow/items/public-api/getAll"
+          );
           if (response.ok) {
             allItems = await response.json();
             applyFilters();
@@ -355,12 +405,16 @@
       }
 
       function applyFilters() {
-        const searchValue = document.getElementById("searchBar").value.toLowerCase();
-        const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-        const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+        const searchValue = document
+          .getElementById("searchBar")
+          .value.toLowerCase();
+        const minPrice =
+          parseFloat(document.getElementById("minPrice").value) || 0;
+        const maxPrice =
+          parseFloat(document.getElementById("maxPrice").value) || Infinity;
         const selectedSort = document.getElementById("sortDropdown").value;
 
-        let filteredItems = allItems.filter(item => {
+        let filteredItems = allItems.filter((item) => {
           const nameMatch = item.name.toLowerCase().includes(searchValue);
           const priceMatch = item.price >= minPrice && item.price <= maxPrice;
           const categoryMatch =
@@ -387,9 +441,9 @@
 
         items.forEach((item) => {
           const productCard = document.createElement("div");
-          productCard.className = "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
-          
-          // Determine the button text and classes based on cartMap state
+          productCard.className =
+            "bg-white border rounded-lg p-4 shadow hover:shadow-lg transition-transform transform hover:scale-105";
+
           let buttonHTML = "";
           if (isLoggedIn) {
             if (cartMap[item.id]) {
@@ -400,17 +454,23 @@
           } else {
             buttonHTML = `<button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">Add to Cart</button>`;
           }
-          
+
           productCard.innerHTML = `
-            <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4">
+            <img src="${item.imageUrl}" alt="${
+            item.name
+          }" class="w-full h-48 object-cover rounded-lg mb-4">
             <h2 class="text-xl font-bold mb-2 text-gray-800">${item.name}</h2>
             <p class="text-gray-600 mb-2">Category: ${item.category}</p>
-            <p class="text-red-500 text-lg font-semibold mb-4">₹${item.price.toFixed(2)}</p>
+            <p class="text-red-500 text-lg font-semibold mb-4">₹${item.price.toFixed(
+              2
+            )}</p>
             ${buttonHTML}
           `;
           const cartButton = productCard.querySelector("button");
           if (isLoggedIn) {
-            cartButton.addEventListener("click", () => toggleCartItem(item.id, cartButton));
+            cartButton.addEventListener("click", () =>
+              toggleCartItem(item.id, cartButton)
+            );
           } else {
             cartButton.addEventListener("click", () => {
               window.location.href = "User/login.html";
@@ -427,10 +487,18 @@
         updateNavbar();
         fetchCategoryItems();
 
-        document.getElementById("searchBar").addEventListener("input", applyFilters);
-        document.getElementById("minPrice").addEventListener("input", applyFilters);
-        document.getElementById("maxPrice").addEventListener("input", applyFilters);
-        document.getElementById("sortDropdown").addEventListener("change", applyFilters);
+        document
+          .getElementById("searchBar")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("minPrice")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("maxPrice")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("sortDropdown")
+          .addEventListener("change", applyFilters);
 
         // Category filter buttons (including "ALL")
         const categoryFilters = document.querySelectorAll(".category-filter");
@@ -449,18 +517,23 @@
                 }
               });
             } else {
-              // Toggle individual category filter
               if (selectedCategories.includes(category)) {
-                selectedCategories = selectedCategories.filter(cat => cat !== category);
+                selectedCategories = selectedCategories.filter(
+                  (cat) => cat !== category
+                );
                 button.classList.remove("bg-red-500", "text-white");
                 button.classList.add("bg-gray-300", "text-gray-800");
               } else {
                 selectedCategories.push(category);
                 button.classList.add("bg-red-500", "text-white");
               }
-              // Un-highlight "ALL" if any specific category is selected
-              document.querySelector('.category-filter[data-category="ALL"]').classList.remove("bg-red-500", "text-white");
-              document.querySelector('.category-filter[data-category="ALL"]').classList.add("bg-gray-300", "text-gray-800");
+
+              document
+                .querySelector('.category-filter[data-category="ALL"]')
+                .classList.remove("bg-red-500", "text-white");
+              document
+                .querySelector('.category-filter[data-category="ALL"]')
+                .classList.add("bg-gray-300", "text-gray-800");
             }
             applyFilters();
           });
