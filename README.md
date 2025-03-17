@@ -1,29 +1,29 @@
-# A Single Restaurant Management System with Online Ordering
+# 🍽️ A Single Restaurant Management System with Online Ordering
 
-## Description
+## 📝 Description
 This project is a complete Restaurant Management System with Online Ordering capabilities. It allows customers to browse the menu, place orders, and track their order status. The system also includes an admin panel for managing menu items, orders, and customers. The backend is built using Spring Boot, providing a RESTful API for seamless integration with the frontend.
 
-### Deployed Frontend Link:
+### 🌐 Deployed Frontend Link:
 [Coming Soon]
 
-### Swagger API Documentation:
+### 📜 Swagger API Documentation:
 [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
 
-## Home Page
+## 🏠 Home Page
 ![Home Page](https://github.com/rahulmk19/A_Single_Restaurant_Management_System_with_Online_Ordering/raw/master/FoodTasteNow_Frontend/Image/Home%20Page.png)
 
-## Admin Dashboard
+## 🛠️ Admin Dashboard
 ![Admin Dashboard](https://github.com/rahulmk19/A_Single_Restaurant_Management_System_with_Online_Ordering/raw/master/FoodTasteNow_Frontend/Image/Admin%20Page.png)
 
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Technology Stack](#technology-stack)
-- [Database ER Diagram](#database-er-diagram)
-- [API Endpoints](#api-endpoints)
-- [Contributors](#contributors)
+## 📖 Table of Contents
+- [📥 Installation](#installation)
+- [⚙️ Usage](#usage)
+- [🛠️ Technology Stack](#technology-stack)
+- [📊 Database ER Diagram](#database-er-diagram)
+- [⚡ API Endpoints](#api-endpoints)
+- [👨‍💻 Contributors](#contributors)
 
-## Installation
+## 📥 Installation
 1. Clone the repository:  
    ```bash
    git clone https://github.com/rahulmk19/A_Single_Restaurant_Management_System_with_Online_Ordering.git
@@ -44,23 +44,23 @@ This project is a complete Restaurant Management System with Online Ordering cap
 - **JWT Security**: Secure API endpoints with JSON Web Tokens (JWT).
 - **Swagger API Docs**: Interactive API documentation for easy testing.
 
-## Usage
-### As an Admin, you can:
+## ⚙️ Usage
+### 🔑 As an Admin, you can:
 - Manage menu items and categories.
 - View and manage all orders.
 - Manage customers and their orders.
 
-### As a Customer, you can:
+### 🛍️ As a Customer, you can:
 - Browse the menu and filter items by category.
 - Add items to the cart and place an order.
 - Track your order status and view order history.
 
-## Technology Stack
+## 🛠️ Technology Stack
 - **Backend:** Java, Spring Boot, Spring Data JPA, JWT Security, MySQL
 - **Frontend:** HTML, CSS, JavaScript (To be implemented)
 - **API Documentation:** Swagger
 
-## API Endpoints
+## ⚡ API Endpoints
 
 ### 👤 Authentication Controller
 | Method | Endpoint | Description |
@@ -102,8 +102,8 @@ This project is a complete Restaurant Management System with Online Ordering cap
 | GET | /foodtastenow/cart/user | View cart |
 | POST | /foodtastenow/cart/user/placedorder | Place order |
 
-## Author
+## ✍️ Author
 Rahul K Thakur  
-Contact: rahulmk.94802@gmail.com  
-LinkedIn: [Rahul K Thakur](https://www.linkedin.com/in/rahulmk19/)
+📧 Contact: rahulmk.94802@gmail.com  
+🔗 LinkedIn: [Rahul K Thakur](https://www.linkedin.com/in/rahulmk19/)
 
